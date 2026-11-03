@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Hallforest Hillhead Caravan Park - Utility Receipt</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f8fafc',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Print-specific layout: Hide controls and show only the receipt */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only-shadow {
+        box-shadow: none !important;
+        border: 1px solid #1e293b !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 24px !important;
+      }
+      @page {
+        margin: 1.5cm;
+        size: auto;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+
+  <!-- Top App Bar -->
+  <header class="no-print bg-slate-900 text-white px-4 py-3.5 sticky top-0 z-30 shadow-md flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+      <h1 class="text-base font-semibold tracking-wide">Park Utility Receipt Generator</h1>
+    </div>
+    <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium shadow flex items-center gap-1.5 active:scale-95 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+      </svg>
+      Print / PDF
+    </button>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-4 md:p-6 lg:py-8 space-y-6">
+
+    <!-- FORM CONTROLS (Hidden when printing) -->
+    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-5">
+      <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Bill & Meter Entry</h2>
+        <button onclick="resetDefaults()" class="text-xs text-blue-600 hover:underline">Reset Defaults</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- Caravan Park / Pitch Details -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Park Name / Site</label>
+          <input id="inParkName" type="text" value="Hallforest Hillhead Caravan Park" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Postcode / Location</label>
+          <input id="inParkLocation" type="text" value="Kintore. AB51 0YX" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">House / Pitch No.</label>
+          <input id="inHouseNo" type="text" value="10" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none font-semibold" />
+        </div>
+
+        <!-- Resident / Month -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Resident / Guest Name</label>
+          <input id="inResidentName" type="text" placeholder="Occupant name (optional)" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Billing Month / Period</label>
+          <input id="inPeriod" type="text" value="Oct-26" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Days in Period</label>
+          <input id="inDays" type="number" value="31" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+
+        <!-- Meter Readings -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Previous Meter Reading</label>
+          <input id="inPrevReading" type="number" step="any" value="5986" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Present Meter Reading</label>
+          <input id="inPresReading" type="number" step="any" value="6490" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-slate-900" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">kWh Unit Rate (£)</label>
+          <input id="inUnitRate" type="number" step="0.001" value="0.248" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+
+        <!-- Fixed / Park Charges -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Standing Charge (£)</label>
+          <input id="inStandingCharge" type="number" step="0.01" value="14.92" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Capacity Charge (£)</label>
+          <input id="inCapacityCharge" type="number" step="0.01" value="3.80" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">VAT Rate (%)</label>
+          <input id="inVatRate" type="number" step="0.1" value="5" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+
+        <!-- Payment details -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Status</label>
+          <select id="inPaymentStatus" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="PAID">PAID</option>
+            <option value="PENDING">PENDING</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Payment / Bill Date</label>
+          <input id="inPaymentDate" type="text" value="02/11/2026" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Method</label>
+          <select id="inPaymentMethod" class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Debit / Credit Card">Debit / Credit Card</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE RECEIPT PREVIEW (Also what gets printed) -->
+    <div id="receiptCard" class="print-only-shadow bg-white rounded-2xl shadow-md border border-slate-200 p-6 md:p-8 relative overflow-hidden">
+
+      <!-- Header Header block matching bill format -->
+      <div class="border-2 border-slate-900 bg-amber-100/50 p-3 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-slate-900">
+        <div class="flex items-center gap-3">
+          <span class="font-bold text-sm tracking-wide uppercase">House / Pitch:</span>
+          <span id="outHouseNo" class="text-2xl font-black bg-white px-3 py-0.5 border border-slate-800 rounded">10</span>
+        </div>
+        <div class="sm:text-right">
+          <p id="outParkName" class="font-bold text-base leading-snug">Hallforest Hillhead Caravan Park</p>
+          <p id="outParkLocation" class="text-xs text-slate-700">Kintore. AB51 0YX</p>
+        </div>
+      </div>
+
+      <!-- Bill Overview Info -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-6 border-b border-slate-200 pb-4">
+        <div>
+          <span class="text-slate-500 block">Period</span>
+          <span id="outPeriod" class="font-semibold text-slate-800 text-sm">Oct-26</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block">Number of Days</span>
+          <span id="outDays" class="font-semibold text-slate-800 text-sm">31 Days</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block">Unit Tariff</span>
+          <span id="outUnitRate" class="font-semibold text-slate-800 text-sm">£0.248 / kWh</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block">Resident</span>
+          <span id="outResident" class="font-semibold text-slate-800 text-sm">Plot Resident</span>
+        </div>
+      </div>
+
+      <!-- Meter Calculation Table -->
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-left text-sm border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-amber-100/60 text-slate-900 border-b border-slate-300 text-xs uppercase font-bold tracking-wider">
+              <th class="p-2.5 border border-slate-300">Description</th>
+              <th class="p-2.5 border border-slate-300 text-center">Meter / Basis</th>
+              <th class="p-2.5 border border-slate-300 text-right">Calculation</th>
+              <th class="p-2.5 border border-slate-300 text-right">Amount (£)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700">
+            <tr>
+              <td class="p-2.5 border border-slate-300 font-medium">Electricity Units Used</td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">
+                <span id="outPresReading">6490</span> - <span id="outPrevReading">5986</span>
+              </td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs">
+                <span id="outUnitsUsed">504</span> kWh @ £<span id="outTableRate">0.248</span>
+              </td>
+              <td class="p-2.5 border border-slate-300 text-right font-semibold text-slate-900">
+                £<span id="outUnitsCost">124.99</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-2.5 border border-slate-300 font-medium">Standard Charge</td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">Standing Monthly Fee</td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs">Fixed Rate</td>
+              <td class="p-2.5 border border-slate-300 text-right font-semibold text-slate-900">
+                £<span id="outStanding">14.92</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="p-2.5 border border-slate-300 font-medium">Capacity Charge (15 kVA)</td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">Sub-station Capacity</td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs">Pro-rata Site Allocation</td>
+              <td class="p-2.5 border border-slate-300 text-right font-semibold text-slate-900">
+                £<span id="outCapacity">3.80</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Financial Totals Block -->
+      <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+        <div class="text-xs text-slate-500 max-w-xs space-y-1">
+          <p class="italic">* Capacity charge calculated based on 15 kVA park distribution allowance.</p>
+          <p>Payment method: <span id="outPayMethod" class="font-medium text-slate-700">Bank Transfer</span></p>
+          <p>Receipt Date: <span id="outReceiptDate" class="font-medium text-slate-700">02/11/2026</span></p>
+        </div>
+
+        <div class="w-full sm:w-64 space-y-2 text-sm bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+          <div class="flex justify-between text-slate-600">
+            <span>Sub-Total:</span>
+            <span class="font-semibold">£<span id="outSubTotal">143.71</span></span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>VAT (<span id="outVatRate">5</span>%):</span>
+            <span class="font-semibold">£<span id="outVatTotal">7.19</span></span>
+          </div>
+          <div class="border-t border-slate-300 pt-2 flex justify-between text-base font-bold text-slate-900">
+            <span>Total Due:</span>
+            <span class="text-emerald-700">£<span id="outGrandTotal">150.90</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stamp / Paid Signature Area (mimicking the handwritten pen mark) -->
+      <div id="paidStampContainer" class="flex items-center justify-end pt-2">
+        <div class="border-4 border-red-600 text-red-600 font-black rounded-xl px-4 py-2 text-center uppercase tracking-widest -rotate-6 select-none opacity-90 inline-block shadow-sm">
+          <div class="text-xl leading-tight" id="outStampText">PAID</div>
+          <div class="text-[10px] tracking-normal font-sans font-bold" id="outStampDate">02/11/2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print Action Footer for Mobile screens -->
+    <div class="no-print pt-2 pb-12 text-center">
+      <button onclick="window.print()" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-8 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 mx-auto">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+        </svg>
+        Print or Save PDF Receipt
+      </button>
+      <p class="text-xs text-slate-400 mt-2">Selecting "Print" allows saving directly as PDF on both iOS & Android.</p>
+    </div>
+
+  </main>
+
+  <!-- Interactive Live Update Script -->
+  <script>
+    const inputs = [
+      'inParkName', 'inParkLocation', 'inHouseNo', 'inResidentName', 
+      'inPeriod', 'inDays', 'inPrevReading', 'inPresReading', 
+      'inUnitRate', 'inStandingCharge', 'inCapacityCharge', 
+      'inVatRate', 'inPaymentStatus', 'inPaymentDate', 'inPaymentMethod'
+    ];
+
+    function updateReceipt() {
+      const parkName = document.getElementById('inParkName').value || 'Hallforest Hillhead Caravan Park';
+      const parkLoc = document.getElementById('inParkLocation').value || 'Kintore. AB51 0YX';
+      const houseNo = document.getElementById('inHouseNo').value || '-';
+      const resident = document.getElementById('inResidentName').value.trim() || 'Resident';
+      const period = document.getElementById('inPeriod').value || '-';
+      const days = document.getElementById('inDays').value || '0';
+      
+      const prev = parseFloat(document.getElementById('inPrevReading').value) || 0;
+      const pres = parseFloat(document.getElementById('inPresReading').value) || 0;
+      const unitRate = parseFloat(document.getElementById('inUnitRate').value) || 0;
+      const standing = parseFloat(document.getElementById('inStandingCharge').value) || 0;
+      const capacity = parseFloat(document.getElementById('inCapacityCharge').value) || 0;
+      const vatRate = parseFloat(document.getElementById('inVatRate').value) || 0;
+      const payStatus = document.getElementById('inPaymentStatus').value;
+      const payDate = document.getElementById('inPaymentDate').value || '';
+      const payMethod = document.getElementById('inPaymentMethod').value;
+
+      // Mathematical calculations
+      const unitsUsed = Math.max(0, pres - prev);
+      const unitsCost = unitsUsed * unitRate;
+      const subTotal = unitsCost + standing + capacity;
+      const vatTotal = (subTotal * vatRate) / 100;
+      const grandTotal = subTotal + vatTotal;
+
+      // Populate Live Receipt
+      document.getElementById('outParkName').textContent = parkName;
+      document.getElementById('outParkLocation').textContent = parkLoc;
+      document.getElementById('outHouseNo').textContent = houseNo;
+      document.getElementById('outResident').textContent = resident;
+      document.getElementById('outPeriod').textContent = period;
+      document.getElementById('outDays').textContent = `${days} Days`;
+
+      document.getElementById('outPresReading').textContent = pres.toFixed(2).replace(/\.00$/, '');
+      document.getElementById('outPrevReading').textContent = prev.toFixed(2).replace(/\.00$/, '');
+      document.getElementById('outUnitsUsed').textContent = unitsUsed.toFixed(2).replace(/\.00$/, '');
+      document.getElementById('outTableRate').textContent = unitRate.toFixed(3);
+      document.getElementById('outUnitRate').textContent = `£${unitRate.toFixed(3)} / kWh`;
+
+      document.getElementById('outUnitsCost').textContent = unitsCost.toFixed(2);
+      document.getElementById('outStanding').textContent = standing.toFixed(2);
+      document.getElementById('outCapacity').textContent = capacity.toFixed(2);
+      document.getElementById('outSubTotal').textContent = subTotal.toFixed(2);
+      document.getElementById('outVatRate').textContent = vatRate;
+      document.getElementById('outVatTotal').textContent = vatTotal.toFixed(2);
+      document.getElementById('outGrandTotal').textContent = grandTotal.toFixed(2);
+
+      document.getElementById('outPayMethod').textContent = payMethod;
+      document.getElementById('outReceiptDate').textContent = payDate;
+
+      // Stamp presentation
+      const stampBox = document.getElementById('paidStampContainer');
+      const stampText = document.getElementById('outStampText');
+      const stampDate = document.getElementById('outStampDate');
+
+      if (payStatus === 'PAID') {
+        stampBox.style.visibility = 'visible';
+        stampText.textContent = 'PAID';
+        stampText.parentElement.className = "border-4 border-emerald-600 text-emerald-600 font-black rounded-xl px-4 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm";
+        stampDate.textContent = payDate;
+      } else {
+        stampBox.style.visibility = 'visible';
+        stampText.textContent = 'UNPAID';
+        stampText.parentElement.className = "border-4 border-amber-600 text-amber-600 font-black rounded-xl px-4 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm";
+        stampDate.textContent = 'PAYMENT DUE';
+      }
+    }
+
+    function resetDefaults() {
+      document.getElementById('inHouseNo').value = "10";
+      document.getElementById('inPeriod').value = "Oct-26";
+      document.getElementById('inDays').value = "31";
+      document.getElementById('inPrevReading').value = "5986";
+      document.getElementById('inPresReading').value = "6490";
+      document.getElementById('inUnitRate').value = "0.248";
+      document.getElementById('inStandingCharge').value = "14.92";
+      document.getElementById('inCapacityCharge').value = "3.80";
+      document.getElementById('inVatRate').value = "5";
+      document.getElementById('inPaymentStatus').value = "PAID";
+      document.getElementById('inPaymentDate').value = "02/11/2026";
+      updateReceipt();
+    }
+
+    // Attach real-time input listeners
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', updateReceipt);
+        el.addEventListener('change', updateReceipt);
+      }
+    });
+
+    // Run on load
+    window.addEventListener('DOMContentLoaded', updateReceipt);
+  </script>
+</body>
+</html>
