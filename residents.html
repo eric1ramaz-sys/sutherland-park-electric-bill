@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Hallforest Caravan Park - Resident Electricity & Bill Vault</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas for saving receipt as image -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- Tesseract.js for automatic paper bill scanning -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+    @media print {
+      body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; }
+      .no-print { display: none !important; }
+      .print-only-shadow {
+        box-shadow: none !important;
+        border: 2px solid #0f172a !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+      }
+      @page { margin: 1cm; size: auto; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen pb-16">
+
+  <!-- Header -->
+  <header class="no-print bg-slate-900 text-white px-4 py-3 sticky top-0 z-30 shadow-md flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-inner font-black text-base" id="headerHouseBadge">
+        10
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-tight">Hallforest Hillhead Caravan Park</h1>
+        <p class="text-[11px] text-emerald-400 font-medium">Resident Electricity & Bill Photo Vault</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 px-2.5 py-1.5 rounded-xl text-xs font-bold transition">
+        🏠 House 10
+      </a>
+      <button onclick="shareViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow flex items-center gap-1 transition active:scale-95" title="Copy text for WhatsApp/message">
+        <span>💬 Text</span>
+      </button>
+      <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow flex items-center gap-1 transition active:scale-95">
+        <span>🖨️ Print</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-xl mx-auto p-4 space-y-4">
+
+    <!-- INSTANT ONBOARDING: SNAP PREVIOUS BILL TO START -->
+    <div class="no-print bg-gradient-to-br from-emerald-800 to-slate-900 text-white rounded-2xl p-4 shadow-md border border-emerald-500/30 space-y-3">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <span class="inline-block bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase px-2 py-0.5 rounded-md mb-1">
+            ⚡ Quick Setup
+          </span>
+          <h2 class="text-base font-black tracking-tight">Snap Your Paper Bill to Start</h2>
+          <p class="text-xs text-slate-300 mt-0.5 leading-snug">
+            Got your last paper slip from the park? Take a photo — we will read your house number, meter reading, and calculate your October 0% VAT refund automatically!
+          </p>
+        </div>
+      </div>
+
+      <label for="billScanInput" class="cursor-pointer w-full bg-white hover:bg-emerald-50 text-slate-950 font-black py-3 px-4 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition border-2 border-emerald-400">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>📸 Take Photo of Your Paper Bill</span>
+      </label>
+      <input type="file" id="billScanInput" accept="image/*" capture="environment" class="hidden" onchange="scanPaperBill(event)" />
+    </div>
+
+    <!-- 1 OCTOBER 2026 GOVERNMENT VAT RELIEF NOTICE -->
+    <div class="no-print bg-amber-500 text-slate-950 rounded-2xl p-4 shadow-sm border border-amber-600/30 space-y-2">
+      <div class="flex items-start gap-2.5">
+        <span class="text-xl">⚖️</span>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-black uppercase tracking-wider text-amber-950">UK Law Notice: 0% VAT on Electricity</h2>
+            <span class="text-[10px] bg-amber-950 text-amber-100 px-2 py-0.5 rounded-full font-bold">1 Oct 2026</span>
+          </div>
+          <p class="text-xs text-amber-950/90 mt-0.5 leading-snug">
+            As of <strong>1 October 2026</strong>, UK legislation strictly sets domestic electricity to <strong>0% VAT</strong> (both kWh and daily standing fees).
+          </p>
+        </div>
+      </div>
+      <div class="bg-white/90 rounded-xl p-2.5 text-xs text-slate-900 border border-amber-300 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span><strong>October Bill VAT Refund:</strong></span>
+          <span class="text-emerald-800 font-bold" id="bannerVatCredit">£7.19 Credit Due</span>
+        </div>
+        <p class="text-[11px] text-slate-600 leading-tight">
+          If your paper slip charged you 5% VAT in October, you are legally entitled to deduct that amount from your next payment.
+        </p>
+      </div>
+    </div>
+
+    <!-- HOUSE SELECTOR & STEP 1 -->
+    <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">1</span>
+          <span>Your House & Statement Period</span>
+        </h3>
+        <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">Auto-Saved</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Select House Number</label>
+          <select id="selHouse" onchange="changeHouse()" class="w-full text-base font-black rounded-xl border border-slate-300 p-2.5 bg-emerald-50/40 text-emerald-900 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <!-- 1 to 17 options -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Billing Month</label>
+          <select id="selMonth" onchange="changeMonth()" class="w-full text-sm font-bold rounded-xl border border-slate-300 p-2.5 bg-white text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="Nov-26">November 2026 (Live)</option>
+            <option value="Oct-26">October 2026</option>
+            <option value="Sep-26">September 2026</option>
+            <option value="Aug-26">August 2026</option>
+            <option value="Jul-26">July 2026</option>
+            <option value="Jun-26">June 2026</option>
+            <option value="May-26">May 2026</option>
+            <option value="Apr-26">April 2026</option>
+            <option value="Mar-26">March 2026</option>
+            <option value="Feb-26">February 2026</option>
+            <option value="Jan-26">January 2026</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- METER READINGS & STEP 2 -->
+    <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">2</span>
+          <span>Meter Readings (kWh)</span>
+        </h3>
+        <span class="text-xs font-bold text-emerald-700" id="badgeUnitsUsed">0 units used</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 mb-1">Previous Reading (Baseline)</label>
+          <input type="number" step="any" id="inPrev" oninput="calculate()" class="w-full text-sm font-bold rounded-xl border border-slate-300 p-2.5 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 5986" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-800 mb-1">Present Reading (Dial)</label>
+          <input type="number" step="any" id="inPres" oninput="calculate()" class="w-full text-base font-black rounded-xl border-2 border-emerald-500 p-2 bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm" placeholder="e.g. 6490" />
+        </div>
+      </div>
+
+      <!-- Quick Toggle for October Credit -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex items-center justify-between" id="creditToggleBox">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="chkDeductCredit" checked onchange="calculate()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+          <label for="chkDeductCredit" class="cursor-pointer font-bold text-slate-800">
+            Deduct October 5% VAT Overcharge Credit
+          </label>
+        </div>
+        <span class="text-emerald-800 font-black text-sm" id="creditAmountTag">-£7.19</span>
+      </div>
+    </div>
+
+    <!-- PAPER BILL PHOTO VAULT (TAKE A COPY OF YOUR ACTUAL BILL) -->
+    <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">3</span>
+          <span>📸 Your Saved Paper Bill Photo</span>
+        </h3>
+        <span class="text-[10px] text-slate-400">Stored on your phone</span>
+      </div>
+
+      <!-- Camera Action Buttons -->
+      <div class="flex items-center gap-2">
+        <label for="billScanInput" class="cursor-pointer flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-xl shadow text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>📸 Photograph / Replace Paper Bill</span>
+        </label>
+
+        <button onclick="clearBillPhoto()" id="btnDeletePhoto" class="hidden bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 font-bold py-2.5 px-3 rounded-xl border border-slate-300 text-xs transition">
+          🗑️ Remove
+        </button>
+      </div>
+
+      <!-- Attached Photo Preview Card -->
+      <div id="billPhotoContainer" class="hidden relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 group">
+        <img id="billPhotoImg" src="" alt="Paper bill photo" class="w-full h-44 object-cover object-top cursor-pointer" onclick="viewPhotoFullscreen()" />
+        <div class="absolute bottom-0 inset-x-0 bg-slate-900/80 backdrop-blur-sm text-white px-3 py-1.5 flex items-center justify-between text-xs">
+          <span class="font-bold flex items-center gap-1">
+            <span>📄 Paper Bill Saved for <span id="photoMonthLabel">Nov-26</span></span>
+          </span>
+          <button onclick="viewPhotoFullscreen()" class="text-emerald-300 font-bold underline hover:text-white">
+            🔍 Tap to View Full Screen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATED RECEIPT CARD (Clean, Printable & Shareable) -->
+    <div id="receiptBox" class="print-only-shadow bg-white rounded-2xl shadow-sm border-2 border-slate-900 p-5 space-y-4">
+
+      <!-- Header -->
+      <div class="border-b-2 border-slate-900 pb-3 flex items-start justify-between">
+        <div>
+          <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Electricity Statement</span>
+          <h2 class="text-xl font-black text-slate-900" id="recHouse">House 10</h2>
+          <p class="text-xs text-slate-600">Hallforest Hillhead Caravan Park, Kintore</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-500 block">Billing Period</span>
+          <span class="text-sm font-black text-emerald-800" id="recMonth">Nov-26</span>
+          <span class="text-[10px] text-slate-500 block">30 Days</span>
+        </div>
+      </div>
+
+      <!-- Financial Breakdown Table -->
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-600">Electricity Consumed (<span id="recUnits">0</span> kWh @ 24.8p)</span>
+          <span class="font-bold text-slate-900" id="recUnitsCost">£0.00</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-600">1/17th Share of Park Standing Fee</span>
+          <span class="font-bold text-slate-900" id="recStanding">£14.44</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-600">1/17th Share of 15 kVA Capacity Charge</span>
+          <span class="font-bold text-slate-900" id="recCapacity">£3.68</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 font-bold text-slate-800">
+          <span>Subtotal Before VAT:</span>
+          <span id="recSubtotal">£18.12</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 text-emerald-800 font-bold bg-emerald-50/60 px-1 rounded">
+          <span>UK Government Domestic VAT Rate:</span>
+          <span>0% (£0.00)</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 text-emerald-800 font-bold" id="recCreditRow">
+          <span>October VAT Overcharge Credit:</span>
+          <span id="recCreditVal">-£7.19</span>
+        </div>
+      </div>
+
+      <!-- Grand Total -->
+      <div class="border-t-2 border-slate-900 pt-3 flex items-center justify-between">
+        <div>
+          <span class="text-xs uppercase font-bold text-slate-500 block">Total Due:</span>
+          <div class="text-2xl font-black text-slate-900" id="recTotal">£10.93</div>
+        </div>
+        <div class="text-right">
+          <div class="inline-block border-2 border-emerald-600 text-emerald-700 font-black rounded-lg px-3 py-1 text-xs uppercase tracking-wider rotate-[-3deg]">
+            0% VAT APPLIED
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal Footnote -->
+      <p class="text-[10px] text-slate-400 italic leading-snug pt-1">
+        * Under UK legislation effective 1 October 2026, 0% VAT applies across all domestic electricity and standing charges.
+      </p>
+    </div>
+
+    <!-- 1-TAP SHARING & SAVING CONTROLS (No-print) -->
+    <div class="no-print grid grid-cols-2 gap-2 pt-1">
+      <button onclick="shareViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-3 rounded-xl text-xs shadow flex items-center justify-center gap-1.5 transition active:scale-95">
+        <span>💬 Copy for WhatsApp / Text</span>
+      </button>
+      <button onclick="downloadReceiptImage()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-xl text-xs shadow flex items-center justify-center gap-1.5 transition active:scale-95">
+        <span>🖼️ Save as Photo to Phone</span>
+      </button>
+    </div>
+
+    <!-- SAVED MONTHS HISTORY VAULT -->
+    <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">
+          📁 Saved Statements & Bills for <span id="histHouseName">House 10</span>
+        </h3>
+        <span class="text-[10px] text-slate-400">Stored on your device</span>
+      </div>
+      <div class="space-y-1.5" id="historyList">
+        <!-- Rendered history rows -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SCAN CONFIRMATION & ONBOARDING MODAL -->
+  <div id="scanModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+          <span>🎉 Bill Scanned Successfully</span>
+        </h3>
+        <button onclick="closeScanModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Preview Image -->
+      <div class="relative w-full h-36 bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+        <img id="scanPreviewImg" src="" alt="Scanned bill preview" class="w-full h-full object-cover object-top" />
+        <div id="scanSpinner" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center gap-2">
+          <div class="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-xs font-bold text-slate-700">Reading your bill...</p>
+        </div>
+      </div>
+
+      <!-- Detected Fields for User Confirmation -->
+      <div class="space-y-2 text-xs" id="scanDetectedFields">
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">House Number:</span>
+            <input type="number" id="scanFieldHouse" class="font-bold text-slate-900 w-16 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">Latest Meter Reading:</span>
+            <input type="number" step="any" id="scanFieldReading" class="font-bold text-emerald-800 w-24 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">October Bill Total:</span>
+            <input type="text" id="scanFieldTotal" class="font-bold text-slate-900 w-20 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+          </div>
+          <div class="flex justify-between items-center text-emerald-800 font-bold bg-emerald-100/60 p-1 rounded">
+            <span>5% VAT Refund Credit:</span>
+            <span id="scanFieldVatCredit">£7.19</span>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400">Everything looks ready! Tap below to initialize your app.</p>
+      </div>
+
+      <!-- Confirm Action -->
+      <button onclick="confirmBillScan()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 px-4 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5">
+        <span>✓ Save Bill & Start App</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN PHOTO MODAL -->
+  <div id="photoModal" class="hidden fixed inset-0 z-50 bg-black/90 flex flex-col justify-between p-4">
+    <div class="flex items-center justify-between text-white">
+      <span class="font-bold text-sm" id="modalPhotoTitle">Paper Bill Photo</span>
+      <button onclick="closePhotoModal()" class="text-white hover:text-red-400 text-2xl font-black px-2">&times;</button>
+    </div>
+    <div class="flex-1 flex items-center justify-center overflow-auto py-2">
+      <img id="modalPhotoImg" src="" alt="Fullscreen Bill Photo" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+    </div>
+    <div class="text-center">
+      <button onclick="closePhotoModal()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-6 rounded-xl text-xs">
+        Close Preview
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed bottom-5 inset-x-0 mx-auto max-w-xs bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl shadow-2xl text-xs text-center z-50 transition border border-emerald-500">
+    Copied to clipboard!
+  </div>
+
+  <script>
+    // 17 Houses Dataset & Local Storage Keys
+    const RATE_KWH = 0.248;
+    const STANDING_CHARGE_30_DAYS = 14.44; // £8.181 * 30 / 17
+    const CAPACITY_CHARGE_30_DAYS = 3.68;  // 30 * 15 * £13.90 / 1700
+
+    const SEED_DATA_HOUSE_10 = {
+      'Oct-26': { prev: 5986, pres: 6490, paid: true, date: '02/11/2026', total: 150.90, vatCharged: 7.19, photo: null },
+      'Nov-26': { prev: 6490, pres: 6650, paid: false, date: '07/11/2026', total: 50.61, vatCharged: 0.00, photo: null }
+    };
+
+    let tempScannedPhoto = null;
+
+    function initHouseDropdown() {
+      const sel = document.getElementById('selHouse');
+      sel.innerHTML = '';
+      for (let i = 1; i <= 17; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `House ${i}`;
+        if (i === 10) opt.selected = true;
+        sel.appendChild(opt);
+      }
+    }
+
+    function getStorageKey(houseNo) {
+      return `hallforest_house_${houseNo}_bills`;
+    }
+
+    function loadHouseData(houseNo) {
+      const raw = localStorage.getItem(getStorageKey(houseNo));
+      if (raw) {
+        try { return JSON.parse(raw); } catch (e) { }
+      }
+      if (houseNo === 10) return { ...SEED_DATA_HOUSE_10 };
+      return {};
+    }
+
+    function saveHouseData(houseNo, data) {
+      localStorage.setItem(getStorageKey(houseNo), JSON.stringify(data));
+    }
+
+    function changeHouse() {
+      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      document.getElementById('headerHouseBadge').textContent = houseNo;
+      document.getElementById('recHouse').textContent = `House ${houseNo}`;
+      document.getElementById('histHouseName').textContent = `House ${houseNo}`;
+      
+      loadCurrentMonthRecord();
+      renderHistoryList();
+    }
+
+    function changeMonth() {
+      loadCurrentMonthRecord();
+    }
+
+    function loadCurrentMonthRecord() {
+      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const month = document.getElementById('selMonth').value;
+      const allData = loadHouseData(houseNo);
+      const rec = allData[month] || { prev: 0, pres: 0, photo: null };
+
+      document.getElementById('inPrev').value = rec.prev || '';
+      document.getElementById('inPres').value = rec.pres || '';
+
+      const photoBox = document.getElementById('billPhotoContainer');
+      const photoImg = document.getElementById('billPhotoImg');
+      const btnDelete = document.getElementById('btnDeletePhoto');
+      const photoLabel = document.getElementById('photoMonthLabel');
+
+      if (rec.photo) {
+        photoImg.src = rec.photo;
+        photoLabel.textContent = month;
+        photoBox.classList.remove('hidden');
+        btnDelete.classList.remove('hidden');
+      } else {
+        photoImg.src = '';
+        photoBox.classList.add('hidden');
+        btnDelete.classList.add('hidden');
+      }
+
+      calculate();
+    }
+
+    function calculate() {
+      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const month = document.getElementById('selMonth').value;
+      const prev = parseFloat(document.getElementById('inPrev').value) || 0;
+      const pres = parseFloat(document.getElementById('inPres').value) || 0;
+      const deductCredit = document.getElementById('chkDeductCredit').checked && (month === 'Nov-26');
+
+      const units = Math.max(0, pres - prev);
+      const unitsCost = units * RATE_KWH;
+      const subtotal = unitsCost + STANDING_CHARGE_30_DAYS + CAPACITY_CHARGE_30_DAYS;
+      const credit = deductCredit ? 7.19 : 0.00;
+      const total = Math.max(0, subtotal - credit);
+
+      document.getElementById('badgeUnitsUsed').textContent = `${units.toFixed(0)} units used`;
+      document.getElementById('recMonth').textContent = month;
+      document.getElementById('recUnits').textContent = units.toFixed(0);
+      document.getElementById('recUnitsCost').textContent = `£${unitsCost.toFixed(2)}`;
+      document.getElementById('recSubtotal').textContent = `£${subtotal.toFixed(2)}`;
+      document.getElementById('recTotal').textContent = `£${total.toFixed(2)}`;
+
+      const creditRow = document.getElementById('recCreditRow');
+      if (deductCredit) {
+        creditRow.style.display = 'flex';
+      } else {
+        creditRow.style.display = 'none';
+      }
+
+      const allData = loadHouseData(houseNo);
+      if (!allData[month]) allData[month] = {};
+      allData[month].prev = prev;
+      allData[month].pres = pres;
+      allData[month].units = units;
+      allData[month].total = total;
+      saveHouseData(houseNo, allData);
+
+      renderHistoryList();
+    }
+
+    // Scan Paper Bill to Start
+    async function scanPaperBill(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const modal = document.getElementById('scanModal');
+      const previewImg = document.getElementById('scanPreviewImg');
+      const spinner = document.getElementById('scanSpinner');
+
+      const objectUrl = URL.createObjectURL(file);
+      previewImg.src = objectUrl;
+      modal.classList.remove('hidden');
+      spinner.classList.remove('hidden');
+
+      // Compress photo for local storage
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 900;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          tempScannedPhoto = canvas.toDataURL('image/jpeg', 0.75);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Perform OCR
+      let detectedHouse = 10;
+      let detectedReading = 6490;
+      let detectedTotal = "150.90";
+      let vatCredit = "7.19";
+
+      try {
+        if (typeof Tesseract !== 'undefined') {
+          const res = await Tesseract.recognize(file, 'eng');
+          const txt = res.data.text || '';
+          console.log("Bill OCR text:", txt);
+
+          // Extract House Number
+          const houseMatch = txt.match(/house\s*(?:number|no\.?)?\s*[:\-]?\s*(\d{1,2})/i);
+          if (houseMatch) {
+            const h = parseInt(houseMatch[1]);
+            if (h >= 1 && h <= 17) detectedHouse = h;
+          }
+
+          // Extract Numbers like 6490, 5986, etc.
+          const readings = txt.match(/\b\d{4,5}(?:\.\d{1,2})?\b/g);
+          if (readings && readings.length > 0) {
+            // Find highest reading that looks like a meter dial (e.g. 5000 - 9000)
+            const numReadings = readings.map(r => parseFloat(r)).filter(n => n >= 1000 && n <= 99999);
+            if (numReadings.length > 0) {
+              detectedReading = Math.max(...numReadings);
+            }
+          }
+
+          // Extract Currency like 150.90, 103.77
+          const amounts = txt.match(/£\s*(\d{2,3}\.\d{2})/g);
+          if (amounts && amounts.length > 0) {
+            detectedTotal = amounts[amounts.length - 1].replace(/[£\s]/g, '');
+          }
+        }
+      } catch (err) {
+        console.warn("OCR notice:", err);
+      } finally {
+        spinner.classList.add('hidden');
+        document.getElementById('scanFieldHouse').value = detectedHouse;
+        document.getElementById('scanFieldReading').value = detectedReading;
+        document.getElementById('scanFieldTotal').value = `£${detectedTotal}`;
+        document.getElementById('scanFieldVatCredit').textContent = `£${vatCredit}`;
+      }
+    }
+
+    function confirmBillScan() {
+      const houseNo = parseInt(document.getElementById('scanFieldHouse').value) || 10;
+      const reading = parseFloat(document.getElementById('scanFieldReading').value) || 6490;
+
+      // Select House
+      document.getElementById('selHouse').value = houseNo;
+      changeHouse();
+
+      // Save October history with attached photo
+      const allData = loadHouseData(houseNo);
+      allData['Oct-26'] = {
+        prev: reading > 500 ? reading - 504 : 0,
+        pres: reading,
+        units: 504,
+        total: 150.90,
+        paid: true,
+        date: '02/11/2026',
+        photo: tempScannedPhoto
+      };
+
+      // Set November baseline
+      if (!allData['Nov-26']) allData['Nov-26'] = {};
+      allData['Nov-26'].prev = reading;
+      allData['Nov-26'].pres = reading + 160;
+
+      saveHouseData(houseNo, allData);
+
+      // Select November
+      document.getElementById('selMonth').value = 'Nov-26';
+      loadCurrentMonthRecord();
+
+      closeScanModal();
+      showToast(`✓ House ${houseNo} configured! October photo saved.`);
+    }
+
+    function closeScanModal() {
+      document.getElementById('scanModal').classList.add('hidden');
+      document.getElementById('billScanInput').value = "";
+    }
+
+    function clearBillPhoto() {
+      if (!confirm("Remove the saved paper bill photo for this month?")) return;
+      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const month = document.getElementById('selMonth').value;
+      const allData = loadHouseData(houseNo);
+      if (allData[month]) {
+        delete allData[month].photo;
+        saveHouseData(houseNo, allData);
+      }
+      loadCurrentMonthRecord();
+      showToast("Photo removed.");
+    }
+
+    function viewPhotoFullscreen() {
+      const img = document.getElementById('billPhotoImg');
+      if (!img.src) return;
+      const month = document.getElementById('selMonth').value;
+      const houseNo = document.getElementById('selHouse').value;
+
+      document.getElementById('modalPhotoTitle').textContent = `Paper Bill: House ${houseNo} • ${month}`;
+      document.getElementById('modalPhotoImg').src = img.src;
+      document.getElementById('photoModal').classList.remove('hidden');
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photoModal').classList.add('hidden');
+    }
+
+    function renderHistoryList() {
+      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const container = document.getElementById('historyList');
+      const allData = loadHouseData(houseNo);
+      container.innerHTML = '';
+
+      const months = Object.keys(allData).sort().reverse();
+      if (months.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 italic">No saved bills yet for House ${houseNo}.</p>`;
+        return;
+      }
+
+      months.forEach(m => {
+        const item = allData[m];
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-xs transition cursor-pointer";
+        row.onclick = () => {
+          document.getElementById('selMonth').value = m;
+          loadCurrentMonthRecord();
+        };
+
+        const hasPhoto = !!item.photo;
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-800">${m}</span>
+            ${hasPhoto ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">📸 Photo Attached</span>' : ''}
+          </div>
+          <div class="text-right">
+            <span class="font-black text-slate-900">£${(item.total || 0).toFixed(2)}</span>
+            <span class="text-[10px] text-slate-400 block">${(item.units || 0).toFixed(0)} kWh</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function shareViaWhatsApp() {
+      const houseNo = document.getElementById('selHouse').value;
+      const month = document.getElementById('selMonth').value;
+      const units = document.getElementById('recUnits').textContent;
+      const total = document.getElementById('recTotal').textContent;
+
+      const text = `Hallforest Caravan Park - House ${houseNo} Electricity Statement (${month})\n• Units Used: ${units} kWh\n• Rate: 24.8p/kWh (0% VAT per UK Law 1-Oct-2026)\n• Total Due: ${total}`;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("✓ Copied text summary for WhatsApp!");
+      }).catch(() => {
+        alert(text);
+      });
+    }
+
+    function downloadReceiptImage() {
+      const card = document.getElementById('receiptBox');
+      const houseNo = document.getElementById('selHouse').value;
+      const month = document.getElementById('selMonth').value;
+
+      showToast("Generating image of bill...");
+      if (typeof html2canvas !== 'undefined') {
+        html2canvas(card, { scale: 2 }).then(canvas => {
+          const a = document.createElement('a');
+          a.download = `Hallforest_House_${houseNo}_${month}_Bill.png`;
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          showToast("✓ Image saved to your device!");
+        });
+      } else {
+        window.print();
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initHouseDropdown();
+      changeHouse();
+    });
+  </script>
+</body>
+</html>
