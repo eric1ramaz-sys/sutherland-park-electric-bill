@@ -428,42 +428,50 @@
 
   <!-- POP-UP CONFIRMATION MODAL FOR METER PHOTO OCR -->
   <div id="ocrModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <span>📸 Verify Your Meter Reading</span>
+          <span>📸 Choose Your Meter Reading</span>
         </h3>
-        <button onclick="closeOcrModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+        <button onclick="closeOcrModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
       </div>
 
-      <div class="text-center space-y-3">
-        <!-- Photo Thumbnail Preview -->
-        <div class="relative w-full h-44 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center">
+      <div class="space-y-4">
+        <!-- Photo Preview with Target Focus Guide -->
+        <div class="relative w-full h-48 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center">
           <img id="ocrPreviewImg" src="" alt="Meter dial preview" class="w-full h-full object-contain" />
-          <div id="ocrLoadingSpinner" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center gap-2">
-            <div class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-xs font-bold text-slate-700">Reading meter dial numbers...</p>
+          <div id="ocrLoadingSpinner" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center gap-3">
+            <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm font-bold text-slate-800">Scanning meter face & dials...</p>
+            <p class="text-xs text-slate-500">Filtering out serial numbers, barcodes & voltages</p>
           </div>
         </div>
 
-        <p class="text-xs text-slate-500">
-          We scanned your photo and found the following numbers on your dial. Please verify or adjust if necessary:
-        </p>
+        <!-- Detected Candidates Tap Buttons -->
+        <div id="ocrCandidateSection" class="space-y-2">
+          <p class="text-xs font-bold text-slate-700">Numbers detected on your meter — tap yours:</p>
+          <div id="ocrCandidatesList" class="flex flex-wrap gap-2 justify-center">
+            <!-- Dynamically populated candidate buttons -->
+          </div>
+        </div>
 
-        <!-- Big verified reading input -->
-        <div class="bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4">
-          <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Detected Meter Reading</label>
-          <input id="ocrDetectedInput" type="number" step="any" class="w-full text-center text-3xl font-black text-slate-900 bg-white border border-emerald-300 rounded-xl py-2 outline-none focus:ring-2 focus:ring-emerald-600" />
+        <!-- Primary Verified Input Box -->
+        <div class="bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 text-center">
+          <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">
+            Selected Reading for Your Bill:
+          </label>
+          <input id="ocrDetectedInput" type="number" step="any" placeholder="e.g. 6490" class="w-full text-center text-3xl font-black text-slate-900 bg-white border border-emerald-300 rounded-xl py-2 outline-none focus:ring-2 focus:ring-emerald-600 shadow-inner" />
+          <p class="text-[11px] text-slate-500 mt-1.5">You can tap a suggested number above or type directly in this box.</p>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="grid grid-cols-2 gap-3 pt-2">
-        <button onclick="closeOcrModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition">
+      <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+        <button onclick="closeOcrModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-xl text-sm transition">
           Retake Photo
         </button>
-        <button onclick="confirmOcrReading()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow transition active:scale-95">
-          ✓ Confirm & Use
+        <button onclick="confirmOcrReading()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl text-sm shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+          <span>✓ Use This Reading</span>
         </button>
       </div>
     </div>
@@ -602,7 +610,7 @@
       updateReceipt();
     }
 
-    // Handle Photo OCR Scanning
+    // Handle Photo OCR Scanning with Smart Meter Candidate Filtering
     async function handleMeterPhoto(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
@@ -611,6 +619,7 @@
       const previewImg = document.getElementById('ocrPreviewImg');
       const spinner = document.getElementById('ocrLoadingSpinner');
       const detectedInput = document.getElementById('ocrDetectedInput');
+      const candidatesList = document.getElementById('ocrCandidatesList');
 
       // Show preview
       const objectUrl = URL.createObjectURL(file);
@@ -618,6 +627,9 @@
       modal.classList.remove('hidden');
       spinner.classList.remove('hidden');
       detectedInput.value = "";
+      candidatesList.innerHTML = "";
+
+      const prevReading = parseFloat(document.getElementById('inPrevReading').value) || 0;
 
       try {
         if (typeof Tesseract !== 'undefined') {
@@ -626,20 +638,113 @@
           });
           
           const text = result.data.text || '';
-          // Extract numbers (looking for 4-6 digit meter readings)
-          const matches = text.match(/\b\d{4,6}\b/g);
-          let candidate = "";
-          if (matches && matches.length > 0) {
-            candidate = matches[0];
+          console.log("Raw OCR text:", text);
+
+          // Standardize text: clean linebreaks & fix common meter LCD letter/number mixups
+          const lines = text.split('\n');
+          const candidateMap = new Map();
+
+          // Ignored electrical standard constants (voltages, frequencies, amperages, years)
+          const ignoredNumbers = new Set([
+            '230', '240', '400', '415', '50', '60', '100', '15',
+            '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'
+          ]);
+
+          lines.forEach(line => {
+            const lowerLine = line.toLowerCase();
+            const hasKwhContext = lowerLine.includes('kwh') || lowerLine.includes('kw') || lowerLine.includes('unit') || lowerLine.includes('total') || lowerLine.includes('read');
+
+            // Find all number-like tokens in this line
+            // Clean up: replace O/o with 0, I/l/| with 1 in digit-dominated tokens
+            const words = line.split(/\s+/);
+            words.forEach(word => {
+              // Strip punctuation around word
+              const cleanWord = word.replace(/^[^\w]+|[^\w]+$/g, '');
+              
+              // Normalize common digital LCD errors
+              const normalized = cleanWord
+                .replace(/O/g, '0').replace(/o/g, '0')
+                .replace(/[Il|]/g, '1')
+                .replace(/[Ss]/g, '5')
+                .replace(/[Bb]/g, '8');
+
+              // Extract contiguous digit sequences (4 to 7 digits, or decimal like 1234.5)
+              const matches = normalized.match(/\b\d{3,7}(?:\.\d{1,2})?\b/g);
+              if (matches) {
+                matches.forEach(m => {
+                  // Strip leading zeroes for numerical evaluation, but keep decimal
+                  const numVal = parseFloat(m);
+                  if (isNaN(numVal) || ignoredNumbers.has(m) || numVal < 10) return;
+
+                  // Score candidate:
+                  let score = 10;
+                  // Bonus if line has kWh or meter terms
+                  if (hasKwhContext) score += 60;
+                  
+                  // Big bonus if candidate is logically >= previous reading and within 3000 kWh usage
+                  if (prevReading > 0) {
+                    if (numVal >= prevReading && numVal <= prevReading + 3000) {
+                      score += 80;
+                    } else if (numVal >= prevReading) {
+                      score += 20;
+                    } else if (numVal < prevReading && numVal > (prevReading * 0.5)) {
+                      score -= 20;
+                    }
+                  }
+
+                  // Typical UK meter dial length is 4 to 6 digits
+                  const intPart = m.split('.')[0];
+                  if (intPart.length >= 4 && intPart.length <= 6) {
+                    score += 25;
+                  }
+
+                  // Store best score for this number
+                  const existing = candidateMap.get(m) || 0;
+                  if (score > existing) {
+                    candidateMap.set(m, score);
+                  }
+                });
+              }
+            });
+          });
+
+          // Sort candidates by score
+          const sortedCandidates = Array.from(candidateMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .map(entry => entry[0]);
+
+          console.log("Filtered & ranked candidates:", sortedCandidates);
+
+          if (sortedCandidates.length > 0) {
+            // Populate tap buttons for each candidate
+            sortedCandidates.slice(0, 5).forEach((cand, idx) => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isTop = idx === 0;
+              btn.className = isTop
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2 rounded-xl text-base shadow-md transition active:scale-95 flex items-center gap-1.5"
+                : "bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl text-sm transition active:scale-95 border border-slate-300";
+              
+              btn.innerHTML = isTop
+                ? `<span>⭐ ${cand}</span> <span class="text-[10px] bg-emerald-800/60 px-1.5 py-0.5 rounded text-emerald-100">Recommended</span>`
+                : `<span>${cand}</span>`;
+
+              btn.onclick = () => {
+                selectCandidate(cand);
+              };
+
+              candidatesList.appendChild(btn);
+            });
+
+            // Pre-select top candidate
+            detectedInput.value = sortedCandidates[0];
           } else {
-            // Fallback: extract any digits
-            const digitsOnly = text.replace(/\D/g, '');
-            if (digitsOnly.length >= 4) {
-              candidate = digitsOnly.slice(0, 5);
-            }
+            // Fallback: simple digit extraction
+            const fallbackDigits = (text.replace(/\D/g, '') || '').slice(0, 5);
+            detectedInput.value = fallbackDigits || document.getElementById('inPresReading').value || "6490";
+            candidatesList.innerHTML = `<p class="text-xs text-amber-700">No clear dial match found automatically. Please enter your reading below:</p>`;
           }
-          
-          detectedInput.value = candidate || document.getElementById('inPresReading').value || "6490";
+
         } else {
           detectedInput.value = document.getElementById('inPresReading').value || "6490";
         }
@@ -649,6 +754,19 @@
       } finally {
         spinner.classList.add('hidden');
       }
+    }
+
+    function selectCandidate(val) {
+      document.getElementById('ocrDetectedInput').value = val;
+      // Visual feedback: highlight selected
+      const pills = document.querySelectorAll('#ocrCandidatesList button');
+      pills.forEach(p => {
+        if (p.textContent.includes(val)) {
+          p.classList.add('ring-2', 'ring-emerald-500', 'ring-offset-1');
+        } else {
+          p.classList.remove('ring-2', 'ring-emerald-500', 'ring-offset-1');
+        }
+      });
     }
 
     function closeOcrModal() {
