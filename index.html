@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sutherland Parks - Electricity & Utility Receipt</title>
+  <title>House 10 - Hallforest Hillhead Caravan Park | Electricity Tracker & Auditor</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Tesseract.js for automatic offline meter photo OCR -->
@@ -57,14 +57,12 @@
   <!-- Top Navigation Bar -->
   <header class="no-print bg-slate-900 text-white px-4 py-3 sticky top-0 z-30 shadow-md flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-inner">
-        <svg class="w-5 h-5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+      <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-inner font-black text-sm">
+        10
       </div>
       <div>
-        <h1 class="text-base font-bold tracking-tight">Sutherland Parks</h1>
-        <p class="text-[11px] text-emerald-400 font-medium">Electricity Bill & Receipt Portal</p>
+        <h1 class="text-base font-bold tracking-tight">Hallforest Hillhead Caravan Park</h1>
+        <p class="text-[11px] text-emerald-400 font-medium">House 10 • Electricity Tracker & VAT Auditor</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -72,24 +70,72 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
         </svg>
-        Print / Save PDF
+        Print / PDF
       </button>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto p-4 md:p-6 lg:py-8 space-y-6">
 
-    <!-- WELCOME / SIMPLICITY BANNER -->
+    <!-- VAT OVERCHARGE ALERT & CREDIT DEDUCTION BANNER -->
+    <div class="no-print bg-amber-500 text-slate-950 rounded-2xl p-5 shadow-sm border-2 border-amber-600/40 space-y-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⚠️</span>
+          <div>
+            <h2 class="text-sm font-black uppercase tracking-wider text-amber-950">October VAT Discrepancy Detected</h2>
+            <p class="text-xs text-amber-950/80 font-medium">0% VAT should have applied starting this period. The park charged 5% VAT in error.</p>
+          </div>
+        </div>
+        <div class="bg-white/90 px-3 py-1.5 rounded-xl border border-amber-300 font-black text-sm text-red-600 shadow-sm shrink-0">
+          Overcharged: +£7.19
+        </div>
+      </div>
+
+      <div class="bg-white/80 rounded-xl p-3 text-xs text-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-amber-200">
+        <div>
+          <span class="font-bold text-slate-900">Park Billed:</span> £150.90 (with £7.19 VAT) • 
+          <span class="font-bold text-emerald-800">Correct 0% Bill:</span> £143.71
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg border border-emerald-300 transition">
+          <input type="checkbox" id="applyVatCredit" checked onchange="updateReceipt()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+          <span>Apply -£7.19 Credit to November</span>
+        </label>
+      </div>
+
+      <!-- Park Manager Note Generator -->
+      <div class="flex items-center justify-between text-xs pt-1">
+        <button onclick="copyManagerNote()" class="text-amber-950 hover:text-black font-bold underline flex items-center gap-1.5 transition">
+          <span>📋 Copy short message to park manager explaining the £7.19 credit</span>
+        </button>
+        <span id="copiedToast" class="hidden text-emerald-900 font-bold bg-emerald-200 px-2 py-0.5 rounded">✓ Copied to clipboard!</span>
+      </div>
+    </div>
+
+    <!-- MONTH SELECTOR / 2026 ARCHIVE BAR -->
+    <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-2">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <span>📅 Browse 2026 Statements (House 10)</span>
+        </h3>
+        <span class="text-[11px] text-slate-400">Click any month to inspect or print</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5" id="monthTabs">
+        <!-- Dynamically generated month buttons -->
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS & PHOTO SCAN -->
     <div class="no-print bg-gradient-to-r from-emerald-800 to-slate-900 rounded-2xl p-5 text-white shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
         <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold mb-2">
-          <span>❄️ Winter Energy Relief</span>
+          <span>⚡ Winter Tariff Active</span>
           <span class="text-white/60">•</span>
-          <span>0% VAT Applied</span>
+          <span>0% VAT Selected</span>
         </div>
-        <h2 class="text-lg font-bold">Easy Electricity Meter Entry</h2>
+        <h2 class="text-lg font-bold">November 2026 Live Meter Estimator</h2>
         <p class="text-xs text-slate-300 max-w-xl mt-1 leading-relaxed">
-          Designed for simplicity: enter your lodge or pitch number, type your meter numbers or snap a photo of the dial, and your receipt will calculate automatically.
+          October closed at <strong>6,490 kWh</strong>. Type your latest dial reading or take a photo to forecast your bill and verify there are no surprises.
         </p>
       </div>
       <!-- Big Snap Photo Quick Action Button -->
@@ -103,7 +149,7 @@
       <input type="file" id="meterPhotoInput" accept="image/*" capture="environment" class="hidden" onchange="handleMeterPhoto(event)" />
     </div>
 
-    <!-- MAIN FORM: EASY ENTRY FOR RESIDENTS -->
+    <!-- MAIN FORM: EASY ENTRY FOR ERIC -->
     <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-6">
       
       <!-- Section 1: Pitch & Resident -->
@@ -111,24 +157,27 @@
         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
           <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">1</span>
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Your Lodge / Pitch Details</h3>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Your Home & Period Details</h3>
           </div>
-          <button onclick="resetDefaults()" class="text-xs text-slate-400 hover:text-emerald-700 transition">Reset to Defaults</button>
+          <button onclick="loadMonth('Nov-26')" class="text-xs text-emerald-700 hover:underline font-semibold">Jump to Current Month (Nov-26)</button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Lodge / Pitch Number <span class="text-red-500">*</span></label>
-            <input id="inHouseNo" type="text" placeholder="e.g. Lodge 12 or Pitch 4" value="" class="w-full text-base font-bold rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 bg-emerald-50/30" />
-            <p class="text-[11px] text-slate-400 mt-1">Leave blank or enter your specific number</p>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Park</label>
+            <input id="inParkName" type="text" value="Hallforest Hillhead Caravan Park" class="w-full text-xs font-semibold rounded-xl border border-slate-300 p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Resident / Guest Name</label>
-            <input id="inResidentName" type="text" placeholder="Optional occupant name" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <label class="block text-xs font-bold text-slate-700 mb-1">House / Pitch</label>
+            <input id="inHouseNo" type="text" value="House 10" class="w-full text-base font-black rounded-xl border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 bg-emerald-50/40" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Billing Month / Period</label>
-            <input id="inPeriod" type="text" value="Nov-26" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none font-medium" />
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Resident</label>
+            <input id="inResidentName" type="text" value="Eric" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Billing Month</label>
+            <input id="inPeriod" type="text" value="Nov-26" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-900" />
           </div>
         </div>
       </div>
@@ -146,16 +195,16 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Previous Meter Reading</label>
-            <input id="inPrevReading" type="number" step="any" value="5986" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
-            <p class="text-[11px] text-slate-400 mt-1">Reading from last bill</p>
+            <input id="inPrevReading" type="number" step="any" value="6490" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <p class="text-[11px] text-slate-400 mt-1">October closing reading</p>
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center justify-between">
               <span>Present Reading (Dial)</span>
               <span class="text-[11px] text-emerald-600 font-normal">📸 Photo verified</span>
             </label>
-            <input id="inPresReading" type="number" step="any" value="6490" class="w-full text-lg font-black rounded-xl border-2 border-emerald-500 p-2 focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 bg-white" />
-            <p class="text-[11px] text-slate-400 mt-1">Enter numbers or use "Snap Meter Photo"</p>
+            <input id="inPresReading" type="number" step="any" value="6650" class="w-full text-lg font-black rounded-xl border-2 border-emerald-500 p-2 focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 bg-white" />
+            <p class="text-[11px] text-slate-400 mt-1">Current dial number</p>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Days in Period</label>
@@ -167,22 +216,22 @@
       <!-- Section 3: Payment & Dates -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Status</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
           <select id="inPaymentStatus" class="w-full text-sm font-semibold rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
-            <option value="PAID">PAID (Receipt Issued)</option>
-            <option value="PENDING">PENDING (Bill Due)</option>
+            <option value="PENDING">PENDING (In Progress)</option>
+            <option value="PAID">PAID</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Payment / Bill Date</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Bill / Statement Date</label>
           <input id="inPaymentDate" type="text" value="07/11/2026" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none" />
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Method</label>
           <select id="inPaymentMethod" class="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
             <option value="Bank Transfer">Bank Transfer</option>
-            <option value="Debit / Credit Card">Debit / Credit Card</option>
             <option value="Cash">Cash</option>
+            <option value="Debit Card">Debit Card</option>
           </select>
         </div>
       </div>
@@ -191,111 +240,71 @@
       <details class="group border border-slate-200 rounded-xl overflow-hidden transition">
         <summary class="cursor-pointer bg-slate-50 hover:bg-slate-100 p-3.5 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between select-none">
           <span class="flex items-center gap-2">
-            <span>⚙️ Park Tariff & Default Charges Settings</span>
-            <span class="text-[10px] font-normal text-slate-500 lowercase">(click to customize rates & VAT)</span>
+            <span>⚙️ Park Tariff Formula & VAT Settings</span>
+            <span class="text-[10px] font-normal text-slate-500 lowercase">(exact Hallforest 17-house distribution)</span>
           </span>
           <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
         </summary>
         <div class="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 border-t border-slate-200">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Park Name</label>
-            <input id="inParkName" type="text" value="Sutherland Parks" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none font-semibold" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Site / Region</label>
-            <input id="inParkLocation" type="text" value="Highlands & Aberdeenshire" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
-          </div>
-          <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Electricity Rate (£ / kWh)</label>
             <input id="inUnitRate" type="number" step="0.001" value="0.248" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <p class="text-[10px] text-slate-400 mt-0.5">Park tariff: 24.8p per kWh</p>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Standing Monthly Fee (£)</label>
-            <input id="inStandingCharge" type="number" step="0.01" value="14.92" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <input id="inStandingCharge" type="number" step="0.01" value="14.44" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <p class="text-[10px] text-slate-400 mt-0.5">30 days @ £8.181 ÷ 17 houses</p>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Capacity Charge (£)</label>
-            <input id="inCapacityCharge" type="number" step="0.01" value="3.80" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Capacity Charge 15 kVA (£)</label>
+            <input id="inCapacityCharge" type="number" step="0.01" value="3.68" class="w-full text-xs rounded-lg border border-slate-300 p-2 focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <p class="text-[10px] text-slate-400 mt-0.5">30 days × 15 × £13.90 ÷ 1700</p>
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
               <span>VAT Rate (%)</span>
-              <span class="text-emerald-700 text-[10px] font-bold">0% Winter Relief</span>
+              <span class="text-emerald-700 text-[10px] font-bold">0% Active</span>
             </label>
             <input id="inVatRate" type="number" step="0.1" value="0" class="w-full text-xs rounded-lg border border-emerald-400 p-2 focus:ring-2 focus:ring-emerald-500 outline-none font-bold bg-emerald-50/50" />
-            <p class="text-[10px] text-slate-400 mt-0.5">Government zero-rate for winter</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Correct zero rate for winter</p>
           </div>
         </div>
       </details>
 
     </div>
 
-    <!-- USAGE MONITOR & SIMPLE COMPARISON GRAPH (No-print) -->
+    <!-- 2026 VISUAL CONSUMPTION TIMELINE (No-print) -->
     <div class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div>
           <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <span>📊 Usage Monitor & Monthly Comparison</span>
+            <span>📊 2026 Monthly Consumption Trend (House 10)</span>
           </h3>
-          <p class="text-xs text-slate-500">Visual check to help you spot any unusual winter power spikes</p>
+          <p class="text-xs text-slate-500">Visual check across all 11 months to see heating vs summer baseline</p>
         </div>
         <div id="usageBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
           Moderate Winter Usage
         </div>
       </div>
 
-      <!-- Simple Lightweight SVG Bar Graph -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-        <div class="md:col-span-2 space-y-3">
-          <!-- Current Month Bar -->
-          <div>
-            <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
-              <span class="font-bold text-emerald-800">Current Period (<span id="graphPeriod">Nov-26</span>)</span>
-              <span class="font-bold"><span id="graphUnits">504</span> kWh (£<span id="graphCost">124.99</span>)</span>
-            </div>
-            <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border border-slate-200">
-              <div id="barCurrent" class="bg-emerald-600 h-4 rounded-full transition-all duration-500" style="width: 65%;"></div>
-            </div>
-          </div>
-
-          <!-- Park Average Guide Bar -->
-          <div>
-            <div class="flex justify-between text-xs font-medium text-slate-500 mb-1">
-              <span>Sutherland Parks Winter Average</span>
-              <span>450 kWh (typical 2-bed lodge)</span>
-            </div>
-            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-              <div class="bg-slate-400 h-2.5 rounded-full" style="width: 58%;"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1.5">
-          <div class="text-slate-500 font-semibold">Daily Breakdown</div>
-          <div class="text-lg font-black text-slate-900" id="graphDailyKwh">16.8 kWh / day</div>
-          <p class="text-[11px] text-slate-500 leading-tight">Average daily cost is approx. <span class="font-bold text-slate-700" id="graphDailyCost">£4.17</span>.</p>
-        </div>
+      <!-- 11-Month Visual Timeline Bars -->
+      <div class="space-y-2 pt-1" id="historyBarsContainer">
+        <!-- Dynamically rendered monthly bars -->
       </div>
-    </div>
 
-    <!-- FRIENDLY ENERGY SAVING TIPS FOR RESIDENTS (No-print) -->
-    <div class="no-print bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-3">
-      <div class="flex items-center gap-2 text-amber-900">
-        <span class="text-lg">💡</span>
-        <h3 class="text-sm font-bold uppercase tracking-wide">Simple Ways to Save Electricity in Your Lodge</h3>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-amber-950">
-        <div class="bg-white/80 p-3 rounded-xl border border-amber-100 shadow-sm">
-          <p class="font-bold text-amber-900 mb-1">🌡️ The 1°C Difference</p>
-          <p class="text-slate-600">Lowering your heating thermostat by just 1°C can trim up to 10% off your monthly bill without losing warmth.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <span class="text-slate-400 block font-medium">Summer Low (May)</span>
+          <span class="text-base font-bold text-slate-800">183 kWh (£67.31)</span>
         </div>
-        <div class="bg-white/80 p-3 rounded-xl border border-amber-100 shadow-sm">
-          <p class="font-bold text-amber-900 mb-1">🚪 Close Interior Doors</p>
-          <p class="text-slate-600">Keep bedroom and bathroom doors closed to lock warmth into the living area where you spend most of your day.</p>
+        <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+          <span class="text-amber-800 block font-medium">Autumn Heating (Oct)</span>
+          <span class="text-base font-bold text-amber-950">504 kWh (£143.71)</span>
         </div>
-        <div class="bg-white/80 p-3 rounded-xl border border-amber-100 shadow-sm">
-          <p class="font-bold text-amber-900 mb-1">⏱️ Heated Towel Rails</p>
-          <p class="text-slate-600">Leaving an electric towel rail on 24/7 costs up to £30/month. Turning it off between uses brings instant savings.</p>
+        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 col-span-2 sm:col-span-1">
+          <span class="text-emerald-700 block font-medium">Current Month Estimate</span>
+          <span class="text-base font-bold text-emerald-900" id="statNovEstimate">~160 kWh</span>
         </div>
       </div>
     </div>
@@ -306,12 +315,12 @@
       <!-- Header block matching official bill format -->
       <div class="border-2 border-slate-900 bg-emerald-50/70 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900">
         <div class="flex items-center gap-3">
-          <span class="font-bold text-sm tracking-wide uppercase">Lodge / Pitch:</span>
-          <span id="outHouseNo" class="text-2xl font-black bg-white px-3 py-0.5 border-2 border-slate-900 rounded-lg text-emerald-900 shadow-sm">-</span>
+          <span class="font-bold text-sm tracking-wide uppercase">House / Pitch:</span>
+          <span id="outHouseNo" class="text-2xl font-black bg-white px-3 py-0.5 border-2 border-slate-900 rounded-lg text-emerald-900 shadow-sm">House 10</span>
         </div>
         <div class="sm:text-right">
-          <p id="outParkName" class="font-black text-lg leading-snug tracking-tight text-slate-900">Sutherland Parks</p>
-          <p id="outParkLocation" class="text-xs text-slate-600 font-medium">Electricity & Utility Receipt</p>
+          <p id="outParkName" class="font-black text-lg leading-snug tracking-tight text-slate-900">Hallforest Hillhead Caravan Park</p>
+          <p id="outParkLocation" class="text-xs text-slate-600 font-medium">Kintore, AB51 0YX • Electricity Statement</p>
         </div>
       </div>
 
@@ -331,7 +340,7 @@
         </div>
         <div>
           <span class="text-slate-400 block font-medium">Resident</span>
-          <span id="outResident" class="font-bold text-slate-800 text-sm">Resident</span>
+          <span id="outResident" class="font-bold text-slate-800 text-sm">Eric</span>
         </div>
       </div>
 
@@ -350,29 +359,41 @@
             <tr>
               <td class="p-2.5 border border-slate-300 font-semibold text-slate-900">Electricity Units Used</td>
               <td class="p-2.5 border border-slate-300 text-center text-xs">
-                <span id="outPresReading">6490</span> - <span id="outPrevReading">5986</span>
+                <span id="outPresReading">6650</span> - <span id="outPrevReading">6490</span>
               </td>
               <td class="p-2.5 border border-slate-300 text-right text-xs">
-                <span id="outUnitsUsed">504</span> kWh @ £<span id="outTableRate">0.248</span>
+                <span id="outUnitsUsed">160</span> kWh @ £<span id="outTableRate">0.248</span>
               </td>
               <td class="p-2.5 border border-slate-300 text-right font-bold text-slate-900">
-                £<span id="outUnitsCost">124.99</span>
+                £<span id="outUnitsCost">39.68</span>
               </td>
             </tr>
             <tr>
               <td class="p-2.5 border border-slate-300 font-medium">Standard Standing Charge</td>
-              <td class="p-2.5 border border-slate-300 text-center text-xs">Monthly Standing Fee</td>
-              <td class="p-2.5 border border-slate-300 text-right text-xs">Fixed Rate</td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">1/17th Share of Park Supply</td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs"><span id="outDaysStand">30</span> days @ £8.181 ÷ 17</td>
               <td class="p-2.5 border border-slate-300 text-right font-semibold text-slate-900">
-                £<span id="outStanding">14.92</span>
+                £<span id="outStanding">14.44</span>
               </td>
             </tr>
             <tr>
               <td class="p-2.5 border border-slate-300 font-medium">Capacity Charge (15 kVA)</td>
-              <td class="p-2.5 border border-slate-300 text-center text-xs">Park Sub-Station Allocation</td>
-              <td class="p-2.5 border border-slate-300 text-right text-xs">Pro-rata Distribution</td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">Sub-Station Distribution</td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs">15kVA × £13.90 ÷ 1700</td>
               <td class="p-2.5 border border-slate-300 text-right font-semibold text-slate-900">
-                £<span id="outCapacity">3.80</span>
+                £<span id="outCapacity">3.68</span>
+              </td>
+            </tr>
+            <!-- Optional VAT Adjustment Row -->
+            <tr id="vatAdjustmentRow" class="bg-amber-50/60 font-semibold text-emerald-900">
+              <td class="p-2.5 border border-slate-300">
+                <span>October VAT Adjustment Credit</span>
+                <span class="block text-[11px] text-slate-500 font-normal">Rebate for 5% VAT erroneously charged on October bill</span>
+              </td>
+              <td class="p-2.5 border border-slate-300 text-center text-xs">Overcharge Credit</td>
+              <td class="p-2.5 border border-slate-300 text-right text-xs">Rebate</td>
+              <td class="p-2.5 border border-slate-300 text-right font-bold text-emerald-800">
+                -£7.19
               </td>
             </tr>
           </tbody>
@@ -382,33 +403,37 @@
       <!-- Financial Totals Block -->
       <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
         <div class="text-xs text-slate-500 max-w-xs space-y-1">
-          <p class="italic">* Capacity charge based on 15 kVA park distribution capacity.</p>
+          <p class="italic">* Capacity charge based on 15 kVA distribution capacity divided across 17 houses.</p>
           <p>Payment method: <span id="outPayMethod" class="font-semibold text-slate-800">Bank Transfer</span></p>
-          <p>Receipt Date: <span id="outReceiptDate" class="font-semibold text-slate-800">07/11/2026</span></p>
-          <p id="vatNotice" class="text-emerald-700 font-medium">✓ Winter Government Relief Rate: 0% VAT</p>
+          <p>Statement Date: <span id="outReceiptDate" class="font-semibold text-slate-800">07/11/2026</span></p>
+          <p id="vatNotice" class="text-emerald-700 font-bold">✓ 0% VAT Active (Relief Period)</p>
         </div>
 
-        <div class="w-full sm:w-64 space-y-2 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="w-full sm:w-72 space-y-2 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
           <div class="flex justify-between text-slate-600">
-            <span>Sub-Total:</span>
-            <span class="font-bold">£<span id="outSubTotal">143.71</span></span>
+            <span>Period Subtotal:</span>
+            <span class="font-bold">£<span id="outSubTotal">57.80</span></span>
           </div>
           <div class="flex justify-between text-slate-600">
             <span>VAT (<span id="outVatRate">0</span>%):</span>
             <span class="font-bold">£<span id="outVatTotal">0.00</span></span>
           </div>
+          <div id="summaryCreditRow" class="flex justify-between text-emerald-800 font-semibold">
+            <span>Oct VAT Credit:</span>
+            <span>-£7.19</span>
+          </div>
           <div class="border-t-2 border-slate-300 pt-2 flex justify-between text-base font-black text-slate-900">
-            <span>Total Due:</span>
-            <span class="text-emerald-700 text-lg">£<span id="outGrandTotal">143.71</span></span>
+            <span>Net Payable:</span>
+            <span class="text-emerald-700 text-xl">£<span id="outGrandTotal">50.61</span></span>
           </div>
         </div>
       </div>
 
       <!-- Stamp / Paid Signature Area -->
       <div id="paidStampContainer" class="flex items-center justify-end pt-2">
-        <div class="border-4 border-emerald-600 text-emerald-600 font-black rounded-xl px-5 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm">
-          <div class="text-xl leading-tight" id="outStampText">PAID</div>
-          <div class="text-[10px] tracking-normal font-sans font-bold" id="outStampDate">07/11/2026</div>
+        <div class="border-4 border-amber-600 text-amber-600 font-black rounded-xl px-5 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm">
+          <div class="text-xl leading-tight" id="outStampText">PENDING</div>
+          <div class="text-[10px] tracking-normal font-sans font-bold" id="outStampDate">IN PROGRESS</div>
         </div>
       </div>
     </div>
@@ -419,9 +444,9 @@
         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
         </svg>
-        Print or Save PDF Receipt
+        Print or Save PDF Statement
       </button>
-      <p class="text-xs text-slate-400 mt-2">Works seamlessly on iPad, mobile phone, and desktop.</p>
+      <p class="text-xs text-slate-400 mt-2">Saved directly on your computer or phone.</p>
     </div>
 
   </main>
@@ -460,7 +485,7 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">
             Selected Reading for Your Bill:
           </label>
-          <input id="ocrDetectedInput" type="number" step="any" placeholder="e.g. 6490" class="w-full text-center text-3xl font-black text-slate-900 bg-white border border-emerald-300 rounded-xl py-2 outline-none focus:ring-2 focus:ring-emerald-600 shadow-inner" />
+          <input id="ocrDetectedInput" type="number" step="any" placeholder="e.g. 6650" class="w-full text-center text-3xl font-black text-slate-900 bg-white border border-emerald-300 rounded-xl py-2 outline-none focus:ring-2 focus:ring-emerald-600 shadow-inner" />
           <p class="text-[11px] text-slate-500 mt-1.5">You can tap a suggested number above or type directly in this box.</p>
         </div>
       </div>
@@ -479,18 +504,112 @@
 
   <!-- Interactive Live Update & Calculation Script -->
   <script>
+    // Canonical Historical Dataset for House 10 from the Park Statements
+    const HISTORICAL_DATA = {
+      'Jan-26': { days: 31, prev: 3291.03, pres: 3899.96, rate: 0.271, standing: 16.20, capacity: 24.80, vatRate: 5, status: 'PAID', date: '02/11/2026', note: '100 kVA cap' },
+      'Feb-26': { days: 28, prev: 3899.96, pres: 4081.00, rate: 0.271, standing: 14.63, capacity: 22.40, vatRate: 5, status: 'PAID', date: '02/11/2026', note: '100 kVA cap' },
+      'Mar-26': { days: 31, prev: 4081.00, pres: 4316.00, rate: 0.271, standing: 16.20, capacity: 24.80, vatRate: 5, status: 'PAID', date: '02/11/2026', note: '100 kVA cap' },
+      'Apr-26': { days: 30, prev: 4316.00, pres: 4543.00, rate: 0.271, standing: 15.68, capacity: 24.00, vatRate: 5, status: 'PAID', date: '02/11/2026', note: '100 kVA cap' },
+      'May-26': { days: 31, prev: 4543.00, pres: 4726.00, rate: 0.248, standing: 14.92, capacity: 3.80, vatRate: 5, status: 'PAID', date: '02/11/2026', note: 'Cap dropped to 15 kVA' },
+      'Jun-26': { days: 30, prev: 4726.00, pres: 5082.00, rate: 0.248, standing: 14.44, capacity: 3.68, vatRate: 5, status: 'PAID', date: '02/11/2026', note: '15 kVA cap' },
+      'Jul-26': { days: 31, prev: 5082.00, pres: 5405.00, rate: 0.248, standing: 14.92, capacity: 3.80, vatRate: 5, status: 'BILLED', date: '02/11/2026', note: '5% VAT charged' },
+      'Aug-26': { days: 31, prev: 5405.00, pres: 5739.00, rate: 0.248, standing: 14.92, capacity: 3.80, vatRate: 5, status: 'BILLED', date: '02/11/2026', note: '5% VAT charged' },
+      'Sep-26': { days: 30, prev: 5739.00, pres: 5986.00, rate: 0.248, standing: 14.44, capacity: 3.68, vatRate: 5, status: 'BILLED', date: '02/11/2026', note: '5% VAT charged' },
+      'Oct-26': { days: 31, prev: 5986.00, pres: 6490.00, rate: 0.248, standing: 14.92, capacity: 3.80, vatRate: 5, status: 'BILLED', date: '02/11/2026', note: 'Charged £150.90 (+£7.19 VAT Overcharge)' },
+      'Nov-26': { days: 30, prev: 6490.00, pres: 6650.00, rate: 0.248, standing: 14.44, capacity: 3.68, vatRate: 0, status: 'PENDING', date: '07/11/2026', note: 'Current In-Progress (0% VAT)' }
+    };
+
+    let activeMonthKey = 'Nov-26';
+
     const inputs = [
-      'inParkName', 'inParkLocation', 'inHouseNo', 'inResidentName', 
+      'inParkName', 'inHouseNo', 'inResidentName', 
       'inPeriod', 'inDays', 'inPrevReading', 'inPresReading', 
       'inUnitRate', 'inStandingCharge', 'inCapacityCharge', 
       'inVatRate', 'inPaymentStatus', 'inPaymentDate', 'inPaymentMethod'
     ];
 
+    function renderMonthTabs() {
+      const container = document.getElementById('monthTabs');
+      container.innerHTML = '';
+      Object.keys(HISTORICAL_DATA).forEach(key => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const isActive = (key === activeMonthKey);
+        const isOct = (key === 'Oct-26');
+        const isNov = (key === 'Nov-26');
+
+        let extraClass = 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300';
+        if (isActive) {
+          extraClass = 'bg-emerald-700 text-white font-bold ring-2 ring-emerald-500 shadow-sm';
+        } else if (isOct) {
+          extraClass = 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold';
+        } else if (isNov) {
+          extraClass = 'bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 font-bold';
+        }
+
+        btn.className = `px-3 py-1.5 rounded-xl text-xs transition active:scale-95 flex items-center gap-1 ${extraClass}`;
+        btn.innerHTML = `<span>${key}</span>${isOct ? ' <span class="text-[9px] bg-red-600 text-white px-1 rounded">Audit</span>' : ''}${isNov ? ' <span class="text-[9px] bg-emerald-800 text-white px-1 rounded">Live</span>' : ''}`;
+        btn.onclick = () => loadMonth(key);
+        container.appendChild(btn);
+      });
+    }
+
+    function renderHistoryBars() {
+      const container = document.getElementById('historyBarsContainer');
+      container.innerHTML = '';
+
+      Object.entries(HISTORICAL_DATA).forEach(([key, d]) => {
+        const units = Math.max(0, d.pres - d.prev);
+        const isCurrent = (key === activeMonthKey);
+        const isNov = (key === 'Nov-26');
+        const widthPct = Math.min(100, Math.max(10, (units / 650) * 100));
+
+        let barColor = 'bg-slate-400';
+        if (key === 'Jan-26' || key === 'Oct-26') barColor = 'bg-amber-500';
+        if (isNov) barColor = 'bg-emerald-600';
+
+        const row = document.createElement('div');
+        row.className = `p-1.5 rounded-lg transition cursor-pointer ${isCurrent ? 'bg-emerald-50 ring-1 ring-emerald-400' : 'hover:bg-slate-50'}`;
+        row.onclick = () => loadMonth(key);
+
+        row.innerHTML = `
+          <div class="flex justify-between text-xs mb-0.5">
+            <span class="font-bold ${isCurrent ? 'text-emerald-900' : 'text-slate-700'}">${key} ${isNov ? '(In progress)' : ''}</span>
+            <span class="text-slate-600 font-medium">${units.toFixed(0)} kWh • <span class="font-bold text-slate-900">£${((units * d.rate) + d.standing + d.capacity).toFixed(2)}</span></span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200">
+            <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${widthPct}%;"></div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function loadMonth(key) {
+      activeMonthKey = key;
+      const data = HISTORICAL_DATA[key];
+      if (!data) return;
+
+      document.getElementById('inPeriod').value = key;
+      document.getElementById('inDays').value = data.days;
+      document.getElementById('inPrevReading').value = data.prev;
+      document.getElementById('inPresReading').value = data.pres;
+      document.getElementById('inUnitRate').value = data.rate;
+      document.getElementById('inStandingCharge').value = data.standing;
+      document.getElementById('inCapacityCharge').value = data.capacity;
+      document.getElementById('inVatRate').value = data.vatRate;
+      document.getElementById('inPaymentStatus').value = data.status;
+      document.getElementById('inPaymentDate').value = data.date;
+
+      renderMonthTabs();
+      renderHistoryBars();
+      updateReceipt();
+    }
+
     function updateReceipt() {
-      const parkName = document.getElementById('inParkName').value || 'Sutherland Parks';
-      const parkLoc = document.getElementById('inParkLocation').value || 'Highlands & Aberdeenshire';
-      const houseNo = document.getElementById('inHouseNo').value.trim() || 'Lodge / Pitch';
-      const resident = document.getElementById('inResidentName').value.trim() || 'Resident';
+      const parkName = document.getElementById('inParkName').value || 'Hallforest Hillhead Caravan Park';
+      const houseNo = document.getElementById('inHouseNo').value.trim() || 'House 10';
+      const resident = document.getElementById('inResidentName').value.trim() || 'Eric';
       const period = document.getElementById('inPeriod').value || '-';
       const days = parseFloat(document.getElementById('inDays').value) || 30;
       
@@ -503,21 +622,23 @@
       const payStatus = document.getElementById('inPaymentStatus').value;
       const payDate = document.getElementById('inPaymentDate').value || '';
       const payMethod = document.getElementById('inPaymentMethod').value;
+      const applyCredit = document.getElementById('applyVatCredit').checked && (period === 'Nov-26');
 
-      // Mathematical calculations
+      // Prevent negative spreadsheet glitches if reading is 0
       const unitsUsed = Math.max(0, pres - prev);
       const unitsCost = unitsUsed * unitRate;
       const subTotal = unitsCost + standing + capacity;
       const vatTotal = (subTotal * vatRate) / 100;
-      const grandTotal = subTotal + vatTotal;
+      const creditDeduction = applyCredit ? 7.19 : 0.00;
+      const grandTotal = Math.max(0, subTotal + vatTotal - creditDeduction);
 
       // Populate Live Receipt
       document.getElementById('outParkName').textContent = parkName;
-      document.getElementById('outParkLocation').textContent = parkLoc;
       document.getElementById('outHouseNo').textContent = houseNo;
       document.getElementById('outResident').textContent = resident;
       document.getElementById('outPeriod').textContent = period;
       document.getElementById('outDays').textContent = `${days} Days`;
+      document.getElementById('outDaysStand').textContent = days;
 
       document.getElementById('outPresReading').textContent = pres.toFixed(2).replace(/\.00$/, '');
       document.getElementById('outPrevReading').textContent = prev.toFixed(2).replace(/\.00$/, '');
@@ -533,16 +654,27 @@
       document.getElementById('outVatTotal').textContent = vatTotal.toFixed(2);
       document.getElementById('outGrandTotal').textContent = grandTotal.toFixed(2);
 
+      // VAT Adjustment Row visibility on receipt
+      const vatAdjRow = document.getElementById('vatAdjustmentRow');
+      const sumCreditRow = document.getElementById('summaryCreditRow');
+      if (applyCredit) {
+        vatAdjRow.style.display = 'table-row';
+        sumCreditRow.style.display = 'flex';
+      } else {
+        vatAdjRow.style.display = 'none';
+        sumCreditRow.style.display = 'none';
+      }
+
       document.getElementById('outPayMethod').textContent = payMethod;
       document.getElementById('outReceiptDate').textContent = payDate;
 
       // VAT Notice
       const vatNoticeEl = document.getElementById('vatNotice');
       if (vatRate === 0) {
-        vatNoticeEl.textContent = "✓ Winter Government Relief Rate: 0% VAT";
-        vatNoticeEl.className = "text-emerald-700 font-medium";
+        vatNoticeEl.textContent = "✓ 0% VAT Active (Relief Period)";
+        vatNoticeEl.className = "text-emerald-700 font-bold";
       } else {
-        vatNoticeEl.textContent = `Standard VAT Rate: ${vatRate}% applied`;
+        vatNoticeEl.textContent = `Standard 5% VAT Applied: £${vatTotal.toFixed(2)}`;
         vatNoticeEl.className = "text-slate-500 font-medium";
       }
 
@@ -556,58 +688,41 @@
         stampText.textContent = 'PAID';
         stampText.parentElement.className = "border-4 border-emerald-600 text-emerald-600 font-black rounded-xl px-5 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm";
         stampDate.textContent = payDate;
+      } else if (payStatus === 'BILLED') {
+        stampBox.style.visibility = 'visible';
+        stampText.textContent = 'BILLED';
+        stampText.parentElement.className = "border-4 border-slate-600 text-slate-600 font-black rounded-xl px-5 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm";
+        stampDate.textContent = 'PAID 2/11/26';
       } else {
         stampBox.style.visibility = 'visible';
-        stampText.textContent = 'PAYMENT DUE';
+        stampText.textContent = 'IN PROGRESS';
         stampText.parentElement.className = "border-4 border-amber-600 text-amber-600 font-black rounded-xl px-5 py-2 text-center uppercase tracking-widest -rotate-6 select-none inline-block shadow-sm";
-        stampDate.textContent = 'PENDING';
+        stampDate.textContent = 'ESTIMATE';
       }
 
-      // Update Mini Graph & Usage Monitor
-      document.getElementById('graphPeriod').textContent = period;
-      document.getElementById('graphUnits').textContent = unitsUsed.toFixed(0);
-      document.getElementById('graphCost').textContent = unitsCost.toFixed(2);
-
-      const dailyKwh = days > 0 ? (unitsUsed / days) : 0;
-      const dailyCost = days > 0 ? (grandTotal / days) : 0;
-      document.getElementById('graphDailyKwh').textContent = `${dailyKwh.toFixed(1)} kWh / day`;
-      document.getElementById('graphDailyCost').textContent = `£${dailyCost.toFixed(2)}`;
-
-      // Graph bar percentage (capped at 100% of standard 800 kWh scale)
-      const barPercent = Math.min(100, Math.max(8, (unitsUsed / 750) * 100));
-      document.getElementById('barCurrent').style.width = `${barPercent}%`;
-
+      // Update badge
       const badge = document.getElementById('usageBadge');
-      if (unitsUsed <= 350) {
-        badge.textContent = "🟢 Low Efficient Usage";
+      if (unitsUsed <= 250) {
+        badge.textContent = "🟢 Summer / Low Usage";
         badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
-      } else if (unitsUsed <= 600) {
-        badge.textContent = "🟡 Moderate Winter Usage";
+      } else if (unitsUsed <= 450) {
+        badge.textContent = "🟡 Moderate Usage";
         badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
       } else {
-        badge.textContent = "🟠 Higher Heating Usage";
+        badge.textContent = "🟠 Winter Heating Spike";
         badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800";
       }
     }
 
-    // Reset to generic defaults
-    function resetDefaults() {
-      document.getElementById('inParkName').value = "Sutherland Parks";
-      document.getElementById('inParkLocation').value = "Highlands & Aberdeenshire";
-      document.getElementById('inHouseNo').value = "";
-      document.getElementById('inResidentName').value = "";
-      document.getElementById('inPeriod').value = "Nov-26";
-      document.getElementById('inDays').value = "30";
-      document.getElementById('inPrevReading').value = "5986";
-      document.getElementById('inPresReading').value = "6490";
-      document.getElementById('inUnitRate').value = "0.248";
-      document.getElementById('inStandingCharge').value = "14.92";
-      document.getElementById('inCapacityCharge').value = "3.80";
-      document.getElementById('inVatRate').value = "0"; // 0% Winter Relief
-      document.getElementById('inPaymentStatus').value = "PAID";
-      document.getElementById('inPaymentDate').value = "07/11/2026";
-      document.getElementById('inPaymentMethod').value = "Bank Transfer";
-      updateReceipt();
+    function copyManagerNote() {
+      const msg = "Hi, regarding the October electricity bill for House 10: it included £7.19 in 5% VAT (total £150.90). As the 0% VAT rate took effect this period, I have deducted this £7.19 credit against the November statement. Thank you!";
+      navigator.clipboard.writeText(msg).then(() => {
+        const toast = document.getElementById('copiedToast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3500);
+      }).catch(err => {
+        alert(msg);
+      });
     }
 
     // Handle Photo OCR Scanning with Smart Meter Candidate Filtering
@@ -621,7 +736,6 @@
       const detectedInput = document.getElementById('ocrDetectedInput');
       const candidatesList = document.getElementById('ocrCandidatesList');
 
-      // Show preview
       const objectUrl = URL.createObjectURL(file);
       previewImg.src = objectUrl;
       modal.classList.remove('hidden');
@@ -638,13 +752,9 @@
           });
           
           const text = result.data.text || '';
-          console.log("Raw OCR text:", text);
-
-          // Standardize text: clean linebreaks & fix common meter LCD letter/number mixups
           const lines = text.split('\n');
           const candidateMap = new Map();
 
-          // Ignored electrical standard constants (voltages, frequencies, amperages, years)
           const ignoredNumbers = new Set([
             '230', '240', '400', '415', '50', '60', '100', '15',
             '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'
@@ -654,34 +764,24 @@
             const lowerLine = line.toLowerCase();
             const hasKwhContext = lowerLine.includes('kwh') || lowerLine.includes('kw') || lowerLine.includes('unit') || lowerLine.includes('total') || lowerLine.includes('read');
 
-            // Find all number-like tokens in this line
-            // Clean up: replace O/o with 0, I/l/| with 1 in digit-dominated tokens
             const words = line.split(/\s+/);
             words.forEach(word => {
-              // Strip punctuation around word
               const cleanWord = word.replace(/^[^\w]+|[^\w]+$/g, '');
-              
-              // Normalize common digital LCD errors
               const normalized = cleanWord
                 .replace(/O/g, '0').replace(/o/g, '0')
                 .replace(/[Il|]/g, '1')
                 .replace(/[Ss]/g, '5')
                 .replace(/[Bb]/g, '8');
 
-              // Extract contiguous digit sequences (4 to 7 digits, or decimal like 1234.5)
               const matches = normalized.match(/\b\d{3,7}(?:\.\d{1,2})?\b/g);
               if (matches) {
                 matches.forEach(m => {
-                  // Strip leading zeroes for numerical evaluation, but keep decimal
                   const numVal = parseFloat(m);
                   if (isNaN(numVal) || ignoredNumbers.has(m) || numVal < 10) return;
 
-                  // Score candidate:
                   let score = 10;
-                  // Bonus if line has kWh or meter terms
                   if (hasKwhContext) score += 60;
                   
-                  // Big bonus if candidate is logically >= previous reading and within 3000 kWh usage
                   if (prevReading > 0) {
                     if (numVal >= prevReading && numVal <= prevReading + 3000) {
                       score += 80;
@@ -692,13 +792,11 @@
                     }
                   }
 
-                  // Typical UK meter dial length is 4 to 6 digits
                   const intPart = m.split('.')[0];
                   if (intPart.length >= 4 && intPart.length <= 6) {
                     score += 25;
                   }
 
-                  // Store best score for this number
                   const existing = candidateMap.get(m) || 0;
                   if (score > existing) {
                     candidateMap.set(m, score);
@@ -708,15 +806,11 @@
             });
           });
 
-          // Sort candidates by score
           const sortedCandidates = Array.from(candidateMap.entries())
             .sort((a, b) => b[1] - a[1])
             .map(entry => entry[0]);
 
-          console.log("Filtered & ranked candidates:", sortedCandidates);
-
           if (sortedCandidates.length > 0) {
-            // Populate tap buttons for each candidate
             sortedCandidates.slice(0, 5).forEach((cand, idx) => {
               const btn = document.createElement('button');
               btn.type = 'button';
@@ -729,28 +823,23 @@
                 ? `<span>⭐ ${cand}</span> <span class="text-[10px] bg-emerald-800/60 px-1.5 py-0.5 rounded text-emerald-100">Recommended</span>`
                 : `<span>${cand}</span>`;
 
-              btn.onclick = () => {
-                selectCandidate(cand);
-              };
-
+              btn.onclick = () => selectCandidate(cand);
               candidatesList.appendChild(btn);
             });
 
-            // Pre-select top candidate
             detectedInput.value = sortedCandidates[0];
           } else {
-            // Fallback: simple digit extraction
             const fallbackDigits = (text.replace(/\D/g, '') || '').slice(0, 5);
-            detectedInput.value = fallbackDigits || document.getElementById('inPresReading').value || "6490";
+            detectedInput.value = fallbackDigits || document.getElementById('inPresReading').value || "6650";
             candidatesList.innerHTML = `<p class="text-xs text-amber-700">No clear dial match found automatically. Please enter your reading below:</p>`;
           }
 
         } else {
-          detectedInput.value = document.getElementById('inPresReading').value || "6490";
+          detectedInput.value = document.getElementById('inPresReading').value || "6650";
         }
       } catch (err) {
         console.warn("OCR Scan note:", err);
-        detectedInput.value = document.getElementById('inPresReading').value || "6490";
+        detectedInput.value = document.getElementById('inPresReading').value || "6650";
       } finally {
         spinner.classList.add('hidden');
       }
@@ -758,7 +847,6 @@
 
     function selectCandidate(val) {
       document.getElementById('ocrDetectedInput').value = val;
-      // Visual feedback: highlight selected
       const pills = document.querySelectorAll('#ocrCandidatesList button');
       pills.forEach(p => {
         if (p.textContent.includes(val)) {
@@ -793,7 +881,11 @@
     });
 
     // Run on load
-    window.addEventListener('DOMContentLoaded', updateReceipt);
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMonthTabs();
+      renderHistoryBars();
+      loadMonth('Nov-26');
+    });
   </script>
 </body>
 </html>
