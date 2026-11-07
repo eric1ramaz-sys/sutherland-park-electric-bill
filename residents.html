@@ -31,18 +31,15 @@
   <!-- Header -->
   <header class="no-print bg-slate-900 text-white px-4 py-3 sticky top-0 z-30 shadow-md flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-inner font-black text-base" id="headerHouseBadge">
-        10
+      <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-inner font-black text-lg" id="headerHouseBadge">
+        ⚡
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-tight">Hallforest Hillhead Caravan Park</h1>
-        <p class="text-[11px] text-emerald-400 font-medium">Resident Electricity & Bill Photo Vault</p>
+        <p class="text-[11px] text-emerald-400 font-medium">Resident Electricity Portal & Bill Vault</p>
       </div>
     </div>
     <div class="flex items-center gap-1.5">
-      <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 px-2.5 py-1.5 rounded-xl text-xs font-bold transition">
-        🏠 House 10
-      </a>
       <button onclick="shareViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow flex items-center gap-1 transition active:scale-95" title="Copy text for WhatsApp/message">
         <span>💬 Text</span>
       </button>
@@ -63,7 +60,7 @@
           </span>
           <h2 class="text-base font-black tracking-tight">Snap Your Paper Bill to Start</h2>
           <p class="text-xs text-slate-300 mt-0.5 leading-snug">
-            Got your last paper slip from the park? Take a photo — we will read your house number, meter reading, and calculate your October 0% VAT refund automatically!
+            Got your paper slip from the park? Take a photo — the app automatically detects your house number, meter reading, and your October 0% VAT refund!
           </p>
         </div>
       </div>
@@ -95,7 +92,7 @@
       <div class="bg-white/90 rounded-xl p-2.5 text-xs text-slate-900 border border-amber-300 space-y-1.5">
         <div class="flex items-center justify-between">
           <span><strong>October Bill VAT Refund:</strong></span>
-          <span class="text-emerald-800 font-bold" id="bannerVatCredit">£7.19 Credit Due</span>
+          <span class="text-emerald-800 font-bold" id="bannerVatCredit">0% Rate Applies</span>
         </div>
         <p class="text-[11px] text-slate-600 leading-tight">
           If your paper slip charged you 5% VAT in October, you are legally entitled to deduct that amount from your next payment.
@@ -110,14 +107,14 @@
           <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">1</span>
           <span>Your House & Statement Period</span>
         </h3>
-        <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">Auto-Saved</span>
+        <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">Private on Device</span>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Select House Number</label>
           <select id="selHouse" onchange="changeHouse()" class="w-full text-base font-black rounded-xl border border-slate-300 p-2.5 bg-emerald-50/40 text-emerald-900 focus:ring-2 focus:ring-emerald-500 outline-none">
-            <!-- 1 to 17 options -->
+            <!-- Dynamically populated 1 to 17 options -->
           </select>
         </div>
         <div>
@@ -152,11 +149,11 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 mb-1">Previous Reading (Baseline)</label>
-          <input type="number" step="any" id="inPrev" oninput="calculate()" class="w-full text-sm font-bold rounded-xl border border-slate-300 p-2.5 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 5986" />
+          <input type="number" step="any" id="inPrev" oninput="calculate()" class="w-full text-sm font-bold rounded-xl border border-slate-300 p-2.5 bg-slate-50 text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="e.g. 5000" />
         </div>
         <div>
           <label class="block text-[11px] font-bold text-slate-800 mb-1">Present Reading (Dial)</label>
-          <input type="number" step="any" id="inPres" oninput="calculate()" class="w-full text-base font-black rounded-xl border-2 border-emerald-500 p-2 bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm" placeholder="e.g. 6490" />
+          <input type="number" step="any" id="inPres" oninput="calculate()" class="w-full text-base font-black rounded-xl border-2 border-emerald-500 p-2 bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm" placeholder="e.g. 5350" />
         </div>
       </div>
 
@@ -168,18 +165,21 @@
             Deduct October 5% VAT Overcharge Credit
           </label>
         </div>
-        <span class="text-emerald-800 font-black text-sm" id="creditAmountTag">-£7.19</span>
+        <div class="flex items-center gap-1">
+          <span class="text-slate-400 font-bold">-£</span>
+          <input type="number" step="0.01" id="inCreditAmount" value="7.19" oninput="calculate()" class="w-16 font-black text-sm text-emerald-800 bg-white border border-slate-300 rounded px-1 py-0.5 text-right outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
       </div>
     </div>
 
-    <!-- PAPER BILL PHOTO VAULT (TAKE A COPY OF YOUR ACTUAL BILL) -->
+    <!-- PAPER BILL PHOTO VAULT -->
     <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
           <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black flex items-center justify-center">3</span>
           <span>📸 Your Saved Paper Bill Photo</span>
         </h3>
-        <span class="text-[10px] text-slate-400">Stored on your phone</span>
+        <span class="text-[10px] text-slate-400">Stored on your device</span>
       </div>
 
       <!-- Camera Action Buttons -->
@@ -211,14 +211,14 @@
       </div>
     </div>
 
-    <!-- CALCULATED RECEIPT CARD (Clean, Printable & Shareable) -->
+    <!-- CALCULATED RECEIPT CARD -->
     <div id="receiptBox" class="print-only-shadow bg-white rounded-2xl shadow-sm border-2 border-slate-900 p-5 space-y-4">
 
       <!-- Header -->
       <div class="border-b-2 border-slate-900 pb-3 flex items-start justify-between">
         <div>
           <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Electricity Statement</span>
-          <h2 class="text-xl font-black text-slate-900" id="recHouse">House 10</h2>
+          <h2 class="text-xl font-black text-slate-900" id="recHouse">Select House</h2>
           <p class="text-xs text-slate-600">Hallforest Hillhead Caravan Park, Kintore</p>
         </div>
         <div class="text-right">
@@ -275,7 +275,7 @@
       </p>
     </div>
 
-    <!-- 1-TAP SHARING & SAVING CONTROLS (No-print) -->
+    <!-- 1-TAP SHARING & SAVING CONTROLS -->
     <div class="no-print grid grid-cols-2 gap-2 pt-1">
       <button onclick="shareViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-3 rounded-xl text-xs shadow flex items-center justify-center gap-1.5 transition active:scale-95">
         <span>💬 Copy for WhatsApp / Text</span>
@@ -289,7 +289,7 @@
     <div class="no-print bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">
-          📁 Saved Statements & Bills for <span id="histHouseName">House 10</span>
+          📁 Saved Statements & Bills for <span id="histHouseName">Your House</span>
         </h3>
         <span class="text-[10px] text-slate-400">Stored on your device</span>
       </div>
@@ -324,19 +324,19 @@
         <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
           <div class="flex justify-between items-center">
             <span class="text-slate-500 font-semibold">House Number:</span>
-            <input type="number" id="scanFieldHouse" class="font-bold text-slate-900 w-16 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+            <input type="number" id="scanFieldHouse" class="font-bold text-slate-900 w-16 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" placeholder="e.g. 4" />
           </div>
           <div class="flex justify-between items-center">
             <span class="text-slate-500 font-semibold">Latest Meter Reading:</span>
-            <input type="number" step="any" id="scanFieldReading" class="font-bold text-emerald-800 w-24 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+            <input type="number" step="any" id="scanFieldReading" class="font-bold text-emerald-800 w-24 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" placeholder="e.g. 5200" />
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-slate-500 font-semibold">October Bill Total:</span>
-            <input type="text" id="scanFieldTotal" class="font-bold text-slate-900 w-20 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" />
+            <span class="text-slate-500 font-semibold">Bill Subtotal / Total:</span>
+            <input type="text" id="scanFieldTotal" class="font-bold text-slate-900 w-20 text-right bg-white border border-slate-300 rounded px-1.5 py-0.5" placeholder="£0.00" />
           </div>
           <div class="flex justify-between items-center text-emerald-800 font-bold bg-emerald-100/60 p-1 rounded">
-            <span>5% VAT Refund Credit:</span>
-            <span id="scanFieldVatCredit">£7.19</span>
+            <span>October 5% VAT Refund:</span>
+            <span id="scanFieldVatCredit">£0.00</span>
           </div>
         </div>
         <p class="text-[11px] text-slate-400">Everything looks ready! Tap below to initialize your app.</p>
@@ -371,27 +371,27 @@
   </div>
 
   <script>
-    // 17 Houses Dataset & Local Storage Keys
+    // Universal Park Tariff Constants
     const RATE_KWH = 0.248;
-    const STANDING_CHARGE_30_DAYS = 14.44; // £8.181 * 30 / 17
+    const STANDING_CHARGE_30_DAYS = 14.44; // £8.181 * 30 / 17 houses
     const CAPACITY_CHARGE_30_DAYS = 3.68;  // 30 * 15 * £13.90 / 1700
-
-    const SEED_DATA_HOUSE_10 = {
-      'Oct-26': { prev: 5986, pres: 6490, paid: true, date: '02/11/2026', total: 150.90, vatCharged: 7.19, photo: null },
-      'Nov-26': { prev: 6490, pres: 6650, paid: false, date: '07/11/2026', total: 50.61, vatCharged: 0.00, photo: null }
-    };
 
     let tempScannedPhoto = null;
 
     function initHouseDropdown() {
       const sel = document.getElementById('selHouse');
-      sel.innerHTML = '';
+      sel.innerHTML = '<option value="" disabled selected>Choose Your House (1 to 17)</option>';
       for (let i = 1; i <= 17; i++) {
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = `House ${i}`;
-        if (i === 10) opt.selected = true;
         sel.appendChild(opt);
+      }
+      // If user previously selected their house on this device, restore it
+      const savedHouse = localStorage.getItem('hallforest_my_house');
+      if (savedHouse) {
+        sel.value = savedHouse;
+        changeHouse();
       }
     }
 
@@ -400,20 +400,25 @@
     }
 
     function loadHouseData(houseNo) {
+      if (!houseNo) return {};
       const raw = localStorage.getItem(getStorageKey(houseNo));
       if (raw) {
         try { return JSON.parse(raw); } catch (e) { }
       }
-      if (houseNo === 10) return { ...SEED_DATA_HOUSE_10 };
       return {};
     }
 
     function saveHouseData(houseNo, data) {
+      if (!houseNo) return;
       localStorage.setItem(getStorageKey(houseNo), JSON.stringify(data));
     }
 
     function changeHouse() {
-      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const houseVal = document.getElementById('selHouse').value;
+      if (!houseVal) return;
+      const houseNo = parseInt(houseVal);
+      localStorage.setItem('hallforest_my_house', houseNo);
+
       document.getElementById('headerHouseBadge').textContent = houseNo;
       document.getElementById('recHouse').textContent = `House ${houseNo}`;
       document.getElementById('histHouseName').textContent = `House ${houseNo}`;
@@ -427,7 +432,8 @@
     }
 
     function loadCurrentMonthRecord() {
-      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseNo = houseVal ? parseInt(houseVal) : null;
       const month = document.getElementById('selMonth').value;
       const allData = loadHouseData(houseNo);
       const rec = allData[month] || { prev: 0, pres: 0, photo: null };
@@ -455,16 +461,18 @@
     }
 
     function calculate() {
-      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseNo = houseVal ? parseInt(houseVal) : null;
       const month = document.getElementById('selMonth').value;
       const prev = parseFloat(document.getElementById('inPrev').value) || 0;
       const pres = parseFloat(document.getElementById('inPres').value) || 0;
-      const deductCredit = document.getElementById('chkDeductCredit').checked && (month === 'Nov-26');
+      const creditAmount = parseFloat(document.getElementById('inCreditAmount').value) || 0;
+      const deductCredit = document.getElementById('chkDeductCredit').checked && (month === 'Nov-26') && creditAmount > 0;
 
       const units = Math.max(0, pres - prev);
       const unitsCost = units * RATE_KWH;
       const subtotal = unitsCost + STANDING_CHARGE_30_DAYS + CAPACITY_CHARGE_30_DAYS;
-      const credit = deductCredit ? 7.19 : 0.00;
+      const credit = deductCredit ? creditAmount : 0.00;
       const total = Math.max(0, subtotal - credit);
 
       document.getElementById('badgeUnitsUsed').textContent = `${units.toFixed(0)} units used`;
@@ -475,21 +483,24 @@
       document.getElementById('recTotal').textContent = `£${total.toFixed(2)}`;
 
       const creditRow = document.getElementById('recCreditRow');
+      const creditVal = document.getElementById('recCreditVal');
       if (deductCredit) {
         creditRow.style.display = 'flex';
+        creditVal.textContent = `-£${credit.toFixed(2)}`;
       } else {
         creditRow.style.display = 'none';
       }
 
-      const allData = loadHouseData(houseNo);
-      if (!allData[month]) allData[month] = {};
-      allData[month].prev = prev;
-      allData[month].pres = pres;
-      allData[month].units = units;
-      allData[month].total = total;
-      saveHouseData(houseNo, allData);
-
-      renderHistoryList();
+      if (houseNo) {
+        const allData = loadHouseData(houseNo);
+        if (!allData[month]) allData[month] = {};
+        allData[month].prev = prev;
+        allData[month].pres = pres;
+        allData[month].units = units;
+        allData[month].total = total;
+        saveHouseData(houseNo, allData);
+        renderHistoryList();
+      }
     }
 
     // Scan Paper Bill to Start
@@ -506,7 +517,6 @@
       modal.classList.remove('hidden');
       spinner.classList.remove('hidden');
 
-      // Compress photo for local storage
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
@@ -526,11 +536,10 @@
       };
       reader.readAsDataURL(file);
 
-      // Perform OCR
-      let detectedHouse = 10;
-      let detectedReading = 6490;
-      let detectedTotal = "150.90";
-      let vatCredit = "7.19";
+      let detectedHouse = "";
+      let detectedReading = "";
+      let detectedTotal = "";
+      let vatCredit = "0.00";
 
       try {
         if (typeof Tesseract !== 'undefined') {
@@ -545,20 +554,24 @@
             if (h >= 1 && h <= 17) detectedHouse = h;
           }
 
-          // Extract Numbers like 6490, 5986, etc.
+          // Extract readings
           const readings = txt.match(/\b\d{4,5}(?:\.\d{1,2})?\b/g);
           if (readings && readings.length > 0) {
-            // Find highest reading that looks like a meter dial (e.g. 5000 - 9000)
             const numReadings = readings.map(r => parseFloat(r)).filter(n => n >= 1000 && n <= 99999);
             if (numReadings.length > 0) {
               detectedReading = Math.max(...numReadings);
             }
           }
 
-          // Extract Currency like 150.90, 103.77
+          // Extract Currency
           const amounts = txt.match(/£\s*(\d{2,3}\.\d{2})/g);
           if (amounts && amounts.length > 0) {
             detectedTotal = amounts[amounts.length - 1].replace(/[£\s]/g, '');
+            const totNum = parseFloat(detectedTotal);
+            if (!isNaN(totNum) && totNum > 0) {
+              // Calculate 5% VAT included (5/105)
+              vatCredit = (totNum * 5 / 105).toFixed(2);
+            }
           }
         }
       } catch (err) {
@@ -567,44 +580,49 @@
         spinner.classList.add('hidden');
         document.getElementById('scanFieldHouse').value = detectedHouse;
         document.getElementById('scanFieldReading').value = detectedReading;
-        document.getElementById('scanFieldTotal').value = `£${detectedTotal}`;
+        document.getElementById('scanFieldTotal').value = detectedTotal ? `£${detectedTotal}` : '';
         document.getElementById('scanFieldVatCredit').textContent = `£${vatCredit}`;
+        if (parseFloat(vatCredit) > 0) {
+          document.getElementById('inCreditAmount').value = vatCredit;
+        }
       }
     }
 
     function confirmBillScan() {
-      const houseNo = parseInt(document.getElementById('scanFieldHouse').value) || 10;
-      const reading = parseFloat(document.getElementById('scanFieldReading').value) || 6490;
+      const houseVal = document.getElementById('scanFieldHouse').value;
+      if (!houseVal) {
+        alert("Please select or enter your house number (1 to 17).");
+        return;
+      }
+      const houseNo = parseInt(houseVal);
+      const reading = parseFloat(document.getElementById('scanFieldReading').value) || 0;
 
       // Select House
       document.getElementById('selHouse').value = houseNo;
       changeHouse();
 
-      // Save October history with attached photo
       const allData = loadHouseData(houseNo);
       allData['Oct-26'] = {
-        prev: reading > 500 ? reading - 504 : 0,
+        prev: reading > 300 ? reading - 300 : 0,
         pres: reading,
-        units: 504,
-        total: 150.90,
+        units: reading > 300 ? 300 : 0,
+        total: parseFloat((document.getElementById('scanFieldTotal').value || '0').replace(/[£\s]/g, '')) || 0,
         paid: true,
         date: '02/11/2026',
         photo: tempScannedPhoto
       };
 
-      // Set November baseline
       if (!allData['Nov-26']) allData['Nov-26'] = {};
       allData['Nov-26'].prev = reading;
-      allData['Nov-26'].pres = reading + 160;
+      allData['Nov-26'].pres = reading;
 
       saveHouseData(houseNo, allData);
 
-      // Select November
       document.getElementById('selMonth').value = 'Nov-26';
       loadCurrentMonthRecord();
 
       closeScanModal();
-      showToast(`✓ House ${houseNo} configured! October photo saved.`);
+      showToast(`✓ House ${houseNo} configured! Bill photo saved.`);
     }
 
     function closeScanModal() {
@@ -614,7 +632,9 @@
 
     function clearBillPhoto() {
       if (!confirm("Remove the saved paper bill photo for this month?")) return;
-      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseNo = houseVal ? parseInt(houseVal) : null;
+      if (!houseNo) return;
       const month = document.getElementById('selMonth').value;
       const allData = loadHouseData(houseNo);
       if (allData[month]) {
@@ -629,9 +649,9 @@
       const img = document.getElementById('billPhotoImg');
       if (!img.src) return;
       const month = document.getElementById('selMonth').value;
-      const houseNo = document.getElementById('selHouse').value;
+      const houseVal = document.getElementById('selHouse').value;
 
-      document.getElementById('modalPhotoTitle').textContent = `Paper Bill: House ${houseNo} • ${month}`;
+      document.getElementById('modalPhotoTitle').textContent = `Paper Bill: House ${houseVal || ''} • ${month}`;
       document.getElementById('modalPhotoImg').src = img.src;
       document.getElementById('photoModal').classList.remove('hidden');
     }
@@ -641,8 +661,13 @@
     }
 
     function renderHistoryList() {
-      const houseNo = parseInt(document.getElementById('selHouse').value) || 10;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseNo = houseVal ? parseInt(houseVal) : null;
       const container = document.getElementById('historyList');
+      if (!houseNo) {
+        container.innerHTML = `<p class="text-xs text-slate-400 italic">Select your house number above to view saved bills.</p>`;
+        return;
+      }
       const allData = loadHouseData(houseNo);
       container.innerHTML = '';
 
@@ -677,12 +702,13 @@
     }
 
     function shareViaWhatsApp() {
-      const houseNo = document.getElementById('selHouse').value;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseLabel = houseVal ? `House ${houseVal}` : 'My House';
       const month = document.getElementById('selMonth').value;
       const units = document.getElementById('recUnits').textContent;
       const total = document.getElementById('recTotal').textContent;
 
-      const text = `Hallforest Caravan Park - House ${houseNo} Electricity Statement (${month})\n• Units Used: ${units} kWh\n• Rate: 24.8p/kWh (0% VAT per UK Law 1-Oct-2026)\n• Total Due: ${total}`;
+      const text = `Hallforest Caravan Park - ${houseLabel} Electricity Statement (${month})\n• Units Used: ${units} kWh\n• Rate: 24.8p/kWh (0% VAT per UK Law 1-Oct-2026)\n• Total Due: ${total}`;
       
       navigator.clipboard.writeText(text).then(() => {
         showToast("✓ Copied text summary for WhatsApp!");
@@ -693,14 +719,15 @@
 
     function downloadReceiptImage() {
       const card = document.getElementById('receiptBox');
-      const houseNo = document.getElementById('selHouse').value;
+      const houseVal = document.getElementById('selHouse').value;
+      const houseLabel = houseVal ? `House_${houseVal}` : 'Statement';
       const month = document.getElementById('selMonth').value;
 
       showToast("Generating image of bill...");
       if (typeof html2canvas !== 'undefined') {
         html2canvas(card, { scale: 2 }).then(canvas => {
           const a = document.createElement('a');
-          a.download = `Hallforest_House_${houseNo}_${month}_Bill.png`;
+          a.download = `Hallforest_${houseLabel}_${month}_Bill.png`;
           a.href = canvas.toDataURL('image/png');
           a.click();
           showToast("✓ Image saved to your device!");
@@ -719,7 +746,6 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initHouseDropdown();
-      changeHouse();
     });
   </script>
 </body>
